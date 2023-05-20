@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/map"
@@ -18,11 +18,11 @@
         android:layout_height="80dp"
         android:layout_marginBottom="50dp"
         android:backgroundTint="@color/blue"
-        android:text="Where to go?"
+        android:text="@string/where_to_go"
         android:layout_alignParentBottom="true"
         android:textColor="#0B0404"
         app:icon="@mipmap/ic_search"
         app:iconTint="@color/black"
-        android:textSize="28dp"
-        />
+        android:textSize="28sp"
+        tools:ignore="HardcodedText" />
 </RelativeLayout>
