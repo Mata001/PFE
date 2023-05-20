@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     double longitude = location.getLongitude();
 
                     // Do something with the current location coordinates
-//                    Toast.makeText(MainActivity.this, "Latitude: " + latitude + ", Longitude: " + longitude, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "a9rraa brk Latitude: " + latitude + ", Longitude: " + longitude, Toast.LENGTH_SHORT).show();
                 }
             }
         };
