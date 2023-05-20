@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             super.onBackPressed();
             return;
         } else {
-            Toast.makeText(this, "Tap twice to exit", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Tap twice to exit ya wa7ch", Toast.LENGTH_SHORT).show();
         }
         mPressed = System.currentTimeMillis();
     }
