@@ -7,6 +7,9 @@ import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.content.Intent;
+import android.location.LocationManager;
+import android.provider.Settings;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,6 +42,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
+import android.content.Context;
+
 
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -47,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
-
+    private LocationManager locationManager;
     public static final int TIME_INTERVAL = 2000;
     private long mPressed;
 
@@ -55,6 +60,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+//--------------------Enable Location services---------------
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(intent);
+        }
+
 //-----------------------------currentLocation-------------------------------------
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 //        --------affichage--------------
@@ -70,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                Toast.makeText(MainActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
             }
         });
+//        ----------
     }
 
     //-------------------Tap twice to exit------------------------
@@ -89,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
 
         // Check if location permission is granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -124,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 20));
                     Toast.makeText(MainActivity.this, "hawala wayni "+currentLatLng, Toast.LENGTH_SHORT).show();
+
                 } else {
                     Toast.makeText(MainActivity.this, "Unable to get current location", Toast.LENGTH_SHORT).show();
                 }
