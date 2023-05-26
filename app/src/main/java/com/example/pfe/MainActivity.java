@@ -145,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static String TAG="info:";
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationManager locationManager;
@@ -181,13 +182,43 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 //----------------------------------Go next Activity----------------------------
-        EditText editText = findViewById(R.id.destination);
-        editText.setOnClickListener(new View.OnClickListener() {
+        // Initialize Places.
+        if(!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), "AIzaSyCnMasBoIdVpjj97TGyBUA44oC09BMxjUs");
+        }
+// Create a new Places client instance.
+        PlacesClient placesClient = Places.createClient(this);
+
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        autocompleteFragment.setLocationBias(RectangularBounds.newInstance(
+                new LatLng(35.696944, -0.633056),
+                new LatLng(35.696944, -0.633056)));
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, DirectionActivity.class);
-                startActivity(intent);
-//                Toast.makeText(MainActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
+            public void onPlaceSelected(@NonNull Place place) {
+                // TODO: Get info about the selected place.
+                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
+                Toast.makeText(MainActivity.this, "ok " + place.getLatLng(), Toast.LENGTH_SHORT).show();
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(place.getLatLng());
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                mMap.addMarker(markerOptions);
+                moveCameraToLocation(place.getLatLng(), 20);
+            }
+
+
+            @Override
+            public void onError(@NonNull Status status) {
+                // TODO: Handle the error.
+                Log.i(TAG, "An error occurred: " + status);
             }
         });
 //        ----------
@@ -429,5 +460,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+    private void moveCameraToLocation(LatLng location, float zoom) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
+        mMap.addMarker(new MarkerOptions().position(location));
     }
 }
