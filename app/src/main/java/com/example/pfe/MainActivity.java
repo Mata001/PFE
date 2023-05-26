@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, Page2.class);
+                Intent intent = new Intent(MainActivity.this, DirectionActivity.class);
                 startActivity(intent);
 //                Toast.makeText(MainActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
             }

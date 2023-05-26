@@ -31,14 +31,14 @@
             android:background="@drawable/text_field_bg"
             >
 <!--            app:startIconDrawable="@drawable/pin"-->
-<!--            <com.google.android.material.textfield.TextInputEditText-->
-<!--                android:id="@+id/destination"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:hint="Where to go ?"-->
-<!--                android:maxLines="1"-->
-<!--                android:inputType="text"-->
-<!--                android:textColorHint="@color/black"/>-->
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/destination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Where to go ?"
+                android:maxLines="1"
+                android:inputType="text"
+                android:textColorHint="@color/black"/>
 <!--                android:drawableStart="@mipmap/ic_search"-->
         </com.google.android.material.textfield.TextInputLayout>
     <View
