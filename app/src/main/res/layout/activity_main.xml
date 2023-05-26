@@ -12,17 +12,63 @@
         android:layout_height="match_parent"
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment" />
-    <Button
-        android:id="@+id/dest"
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginBottom="50dp"
-        android:backgroundTint="@color/blue"
-        android:text="@string/where_to_go"
-        android:layout_alignParentBottom="true"
-        android:textColor="#0B0404"
-        app:icon="@mipmap/ic_search"
-        app:iconTint="@color/black"
-        android:textSize="28sp"
-        tools:ignore="HardcodedText" />
+        android:layout_height="120dp"
+        android:id="@+id/coordinator">
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="40dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:elevation="10dp"
+            app:hintEnabled="false"
+            app:boxStrokeWidth="0dp"
+            app:endIconMode="clear_text"
+            app:layout_anchor="@id/view"
+            app:layout_anchorGravity="bottom|center"
+            android:background="@drawable/text_field_bg"
+            >
+<!--            app:startIconDrawable="@drawable/pin"-->
+<!--            <com.google.android.material.textfield.TextInputEditText-->
+<!--                android:id="@+id/destination"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:hint="Where to go ?"-->
+<!--                android:maxLines="1"-->
+<!--                android:inputType="text"-->
+<!--                android:textColorHint="@color/black"/>-->
+<!--                android:drawableStart="@mipmap/ic_search"-->
+        </com.google.android.material.textfield.TextInputLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/view"
+        android:layout_marginBottom="30dp"
+        />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_behavior="@string/bottom_sheet_behavior"
+    tools:context=".MainActivityActivity">
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="150dp"
+            android:layout_marginEnd="40dp"
+            android:tint="@color/black"
+            android:backgroundTint="@color/blue"
+            app:fabCustomSize="40dp"
+            android:src="@drawable/pin"
+            android:id="@+id/currLoc"/>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+
+
 </RelativeLayout>

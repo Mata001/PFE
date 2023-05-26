@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.service.controls.actions.FloatAction;
 import android.view.View;
 import android.widget.Button;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.provider.Settings;
+import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,6 +44,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import android.content.Context;
 
 
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
 
 //--------------------Enable Location services---------------
 
@@ -70,14 +74,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             startActivity(intent);
         }
 
+
 //-----------------------------currentLocation-------------------------------------
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        currentLocationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                enableCurrentLocation();
+            }
+        });
 //        --------affichage--------------
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 //----------------------------------Go next Activity----------------------------
-        Button button = findViewById(R.id.dest);
-        button.setOnClickListener(new View.OnClickListener() {
+        EditText editText = findViewById(R.id.destination);
+        editText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, Page2.class);
@@ -86,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 //        ----------
+
     }
 
     //-------------------Tap twice to exit------------------------
@@ -141,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 20));
                     Toast.makeText(MainActivity.this, "hawala wayni "+currentLatLng, Toast.LENGTH_SHORT).show();
+//                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), 20));
 
                 } else {
                     Toast.makeText(MainActivity.this, "Unable to get current location", Toast.LENGTH_SHORT).show();
