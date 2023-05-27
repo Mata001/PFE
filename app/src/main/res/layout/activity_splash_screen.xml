@@ -17,21 +17,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/wordmark"
-        android:text="PFE"
+        android:text="PFE Application"
         android:layout_below="@+id/logo"
         android:padding="20dp"
         android:layout_margin="20dp"
-        android:background="@color/black"
-        android:textColor="@color/blue"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:textSize="30dp"
+        android:textStyle="bold"
         />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="PFE"
-        android:layout_below="@+id/wordmark"
-        android:padding="20dp"
-        android:layout_marginHorizontal="20dp"
-        android:background="@color/blue"
+        android:text="Farouk X Maher"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp"
+        android:textColor="@color/blue"
+        android:gravity="center|bottom"
+        android:textSize="20dp"
         />
 
 </RelativeLayout>
