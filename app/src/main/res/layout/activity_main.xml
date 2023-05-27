@@ -16,6 +16,7 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="120dp"
+        android:backgroundTint="@color/black"
         android:id="@+id/coordinator">
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -25,7 +26,6 @@
             android:elevation="10dp"
             app:hintEnabled="false"
             app:boxStrokeWidth="0dp"
-            app:endIconMode="clear_text"
             app:layout_anchor="@id/view"
             app:layout_anchorGravity="bottom|center"
             android:background="@drawable/text_field_bg"
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"/>
         </com.google.android.material.textfield.TextInputLayout>
-    <View
+        <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/view"
