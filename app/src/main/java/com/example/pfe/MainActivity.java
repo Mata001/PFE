@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View view) {
                 enableCurrentLocation();
+                mMap.clear();
             }
         });
 //        --------affichage--------------
@@ -264,8 +265,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mPressed = System.currentTimeMillis();
     }
 
-    //--------------------------------------------
-//    --------------------------currentLocation-----------------------
+     //--------------------------------------------------
+//--------------------------currentLocation-----------------------
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
