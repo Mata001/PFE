@@ -151,14 +151,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationManager locationManager;
     public static final int TIME_INTERVAL = 2000;
     private long mPressed;
-
     ArrayList <LatLng> listPoints;
+
+    ArrayList <LatLng> locdest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         listPoints = new ArrayList<>();
+        locdest = new ArrayList<>();
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
 
 //--------------------Enable Location services---------------
@@ -205,13 +207,38 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
+                mMap.clear();
                 Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
                 Toast.makeText(MainActivity.this, "ok " + place.getLatLng(), Toast.LENGTH_SHORT).show();
+                //MarkerOptions markerOptions = new MarkerOptions();
+                //markerOptions.position(place.getLatLng());
+                //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                //mMap.addMarker(markerOptions);
+                moveCameraToLocation(place.getLatLng(), 15);
+                if (locdest.size() == 2) {
+                    locdest.clear();
+                    mMap.clear();
+                }
+                locdest.add(place.getLatLng());
+                //Create marker
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(place.getLatLng());
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                if (locdest.size() == 1) {
+                    //Add first marker to the map
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                } else {
+                    //Add second marker to the map
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                }
                 mMap.addMarker(markerOptions);
-                moveCameraToLocation(place.getLatLng(), 20);
+
+                if (locdest.size() == 2) {
+                    //Create the URL to get request from first marker to second marker
+                    String url = getRequestUrl(locdest.get(0), locdest.get(1));
+                    TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
+                    taskRequestDirections.execute(url);
+                }
+
             }
 
 
@@ -297,11 +324,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Set waypoints those are the bus stations
         String way = "waypoints=optimize:true|via:35.667992, -0.636142|via:35.671489, -0.629100";
         //Mode for find direction
-        String mode =  "mode= walking";
+        String mode =  "mode= driving";
         //String key for api key
         String key = "key=AIzaSyBXqq6EL6IwRunjoA9r7ctDwzikEaN1FEE";
         //Build the full param
-        String param = alt +"&"+ str_org +"&" +mode +"&"+ str_dest +  "&"+ way+ "&" +key;
+        String param = alt +"&"+ str_org +"&" +mode +"&"+ str_dest +
+                //"&"+ way+
+                "&" +key;
         //Output format
         String output = "json";
         //Create url to request
@@ -437,6 +466,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     LatLng oran= new LatLng(35.696944, -0.633056);
                     // Move the camera to the user's current location
                     LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    if (locdest.size() > 0) {
+                        locdest.clear();
+                    }
+                    locdest.add(currentLatLng);
+
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(oran, 10));
                     Toast.makeText(MainActivity.this, "hawala wayni "+currentLatLng, Toast.LENGTH_SHORT).show();
 //                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), 20));
