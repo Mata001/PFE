@@ -247,6 +247,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 == PackageManager.PERMISSION_GRANTED) {
             // Enable current location button and show current location on the map
             enableCurrentLocation();
+            mMap.getUiSettings().setMyLocationButtonEnabled(false);
         } else {
             // Request location permission
             ActivityCompat.requestPermissions(this,
