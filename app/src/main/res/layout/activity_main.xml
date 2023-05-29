@@ -16,36 +16,34 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="120dp"
+
         android:id="@+id/coordinator">
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="40dp"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:elevation="10dp"
+
             app:hintEnabled="false"
             app:boxStrokeWidth="0dp"
-            app:endIconMode="clear_text"
+
             app:layout_anchor="@id/view"
             app:layout_anchorGravity="bottom|center"
             android:background="@drawable/text_field_bg"
             >
-<!--            app:startIconDrawable="@drawable/pin"-->
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/destination"
+
+            <fragment
+                android:id="@+id/autocomplete_fragment"
+                android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Where to go ?"
-                android:maxLines="1"
-                android:inputType="text"
-                android:textColorHint="@color/black"/>
-<!--                android:drawableStart="@mipmap/ic_search"-->
+                android:layout_gravity="top|start"
+                 />
         </com.google.android.material.textfield.TextInputLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/view"
-        android:layout_marginBottom="30dp"
         />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
