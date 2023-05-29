@@ -117,10 +117,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, Page2.class);
-                startActivity(intent);
-//                Toast.makeText(MainActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
                 Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
