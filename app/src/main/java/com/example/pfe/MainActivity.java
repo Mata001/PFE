@@ -195,9 +195,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        autocompleteFragment.setLocationBias(RectangularBounds.newInstance(
-                new LatLng(35.696944, -0.633056),
-                new LatLng(35.696944, -0.633056)));
+        autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(
+                new LatLng(35.604562, -0.748931),
+                new LatLng(35.788521, -0.501718)));
 
         // Specify the types of place data to return.
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
@@ -431,8 +431,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
 
                 polylineOptions.addAll(points);
-                polylineOptions.width(15f);
-                polylineOptions.color(Color.BLUE);
+                polylineOptions.width(10f);
+                polylineOptions.color(Color.rgb(180, 247, 141));
                 polylineOptions.startCap(new RoundCap());
                 polylineOptions.jointType(1);
                 polylineOptions.geodesic(true);
