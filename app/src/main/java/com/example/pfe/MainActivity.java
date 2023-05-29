@@ -387,7 +387,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                     locdest.add(currentLatLng);
 
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(oran, 10));
+//                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(oran, 10));
                     Toast.makeText(MainActivity.this, "hawala wayni "+currentLatLng, Toast.LENGTH_SHORT).show();
 //                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), 20));
 
