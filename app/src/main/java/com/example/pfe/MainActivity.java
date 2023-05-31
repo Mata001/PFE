@@ -202,13 +202,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     ModelTram modelTram = dataSnapshot.getValue(ModelTram.class);
-                    Location location = new Location(modelTram.getCoordinates());
-                    LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+                    String[] coord = modelTram.getCoordinates().split(",");
+                    LatLng latLng = new LatLng(Double.parseDouble(coord[1]),Double.parseDouble(coord[0]));
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                     mMap.addMarker(markerOptions);
                 }
-                Log.i(TAG, "ok " );
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
