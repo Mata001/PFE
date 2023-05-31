@@ -205,8 +205,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     String[] coord = modelTram.getCoordinates().split(",");
                     LatLng latLng = new LatLng(Double.parseDouble(coord[1]),Double.parseDouble(coord[0]));
                     MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                    mMap.addMarker(markerOptions);
+                    markerOptions.position(latLng).title(modelTram.getName()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    mMap.addMarker(markerOptions).showInfoWindow();
                 }
             }
             @Override
