@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -39,6 +40,11 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationManager locationManager;
     public static final int TIME_INTERVAL = 2000;
     private long mPressed;
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
     ArrayList <LatLng> listPoints;
 
     ArrayList <LatLng> locdest;
@@ -76,6 +84,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         listPoints = new ArrayList<>();
         locdest = new ArrayList<>();
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+
 
 //--------------------Enable Location services---------------
 
@@ -165,6 +176,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 //        ----------
 
+        databaseReference = FirebaseDatabase.getInstance().getReference("post");
+
     }
 
     //-------------------Tap twice to exit------------------------
@@ -183,7 +196,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //--------------------------currentLocation-----------------------
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Model model = dataSnapshot.getValue(Model.class);
+                    LatLng latLng = new LatLng(model.getLatitude(), model.getLongitude());
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    mMap.addMarker(markerOptions);
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
         mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         // Check if location permission is granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -370,6 +400,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        //database marker
 
         // Enable the location layer on the map
         mMap.setMyLocationEnabled(true);
@@ -381,7 +412,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (location != null) {
                     // Move the camera to the user's current location
                     LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    moveCameraToLocation(currentLatLng,50);
+                    moveCameraToLocation(currentLatLng,10);
                     if (locdest.size() > 0) {
                         locdest.clear();
                     }
