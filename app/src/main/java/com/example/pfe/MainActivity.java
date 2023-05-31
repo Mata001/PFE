@@ -207,10 +207,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     double latitude = Double.parseDouble(latlong[1]);
                     LatLng latLng = new LatLng(latitude,longitude);
                     MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.position(latLng).title(modelTram.getName()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    markerOptions.position(latLng).title(modelTram.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.piner));
                     mMap.addMarker(markerOptions).showInfoWindow();
                 }
-                Log.i(TAG, "ok " );
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
