@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     DatabaseReference databaseReference;
     ArrayList <LatLng> listPoints;
 
-    ArrayList <LatLng> locdest;
+    ArrayList <LatLng>locdest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 //        ----------
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("post");
+        databaseReference = FirebaseDatabase.getInstance().getReference("features");
 
     }
 
@@ -201,12 +201,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Model model = dataSnapshot.getValue(Model.class);
-                    LatLng latLng = new LatLng(model.getLatitude(), model.getLongitude());
+                    ModelTram modelTram = dataSnapshot.getValue(ModelTram.class);
+                    Location location = new Location(modelTram.getCoordinates());
+                    LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                     mMap.addMarker(markerOptions);
                 }
+                Log.i(TAG, "ok " );
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
