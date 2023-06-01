@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
     ArrayList <LatLng> listPoints;
-
+    int i;
     ArrayList <LatLng>locdest;
 
     @Override
@@ -193,19 +193,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
      //--------------------------------------------------
-//--------------------------currentLocation-----------------------
+//-------------------------------------------------
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
+        int start=8;
+        int end=15;
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                    DataSnapshot dataSnapshot = snapshot.getChildren();
+//                for ( i=start;i<end;i++)
+//                {
+//                    ModelTram modelTram = snapshot.child(Integer.toString(i)).getValue(ModelTram.class);
+//                    String[] latlong = modelTram.getCoordinates().split(",");
+//                    double longitude = Double.parseDouble(latlong[0]);
+//                    double latitude = Double.parseDouble(latlong[1]);
+//                    LatLng latLng = new LatLng(latitude, longitude);
+//                    MarkerOptions markerOptions = new MarkerOptions();
+//                    markerOptions.position(latLng).title(modelTram.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.piner));
+//                    mMap.addMarker(markerOptions).showInfoWindow();
+//                }
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     ModelTram modelTram = dataSnapshot.getValue(ModelTram.class);
-                    String[] latlong =  modelTram.getCoordinates().split(",");
-                    double longitude = Double.parseDouble(latlong[0]);
-                    double latitude = Double.parseDouble(latlong[1]);
-                    LatLng latLng = new LatLng(latitude,longitude);
+                    LatLng latLng = castToLatLng(modelTram);
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(latLng).title(modelTram.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.piner));
                     mMap.addMarker(markerOptions).showInfoWindow();
@@ -445,8 +455,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
-    private void moveCameraToLocation(LatLng location, float zoom) {
+    public void moveCameraToLocation(LatLng location, float zoom) {
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
         mMap.addMarker(new MarkerOptions().position(location));
     }
+//    private void closestStopStation() {
+//        List<ModelTram> coordinates = new ArrayList<>();
+//        ModelTram closestStopStation=null;
+//        double closestDistance=Double.MAX_VALUE;
+//            for(ModelTram station : stations){
+//                double distance = calculateDistance( );
+//                if(distance<closestDistance){
+//                    closestDistance= distance;
+//                    closestStopStation=station;
+//                }
+//            }
+//
+//            moveCameraToLocation(closestStopStation.getCoordinates(), 20);
+//
+//
+//    }
+    public LatLng castToLatLng(ModelTram modelTram){
+        String[] latlong = modelTram.getCoordinates().split(",");
+        double longitude = Double.parseDouble(latlong[0]);
+        double latitude = Double.parseDouble(latlong[1]);
+        LatLng latLng = new LatLng(latitude,longitude);
+        return latLng;
+    }
+
+
 }
