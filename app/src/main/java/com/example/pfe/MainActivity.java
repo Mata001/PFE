@@ -75,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
     ArrayList <LatLng> listPoints;
+    ArrayList<String> destinations;
+
 
     ArrayList <LatLng>locdest;
 
@@ -84,9 +86,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
         listPoints = new ArrayList<>();
         locdest = new ArrayList<>();
+        destinations = new ArrayList<>();
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
+
 
 
 //--------------------Enable Location services---------------
@@ -108,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.d(TAG, "Failed to retrieve distance.");
             }
         });
+
 
 //-----------------------------currentLocation-------------------------------------
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -176,6 +181,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
                     taskRequestDirections.execute(url);
                 }
+                //------------------------------find closest point--------------------------------
+
+                ClosestPointFinder.findClosestPoint("Caféteria CHERGUI,6,Oran", destinations, new ClosestPointFinder.DistanceCallback() {
+                    @Override
+                    public void onDistanceReceived(int distance) {
+                        Log.d(TAG, "onDistanceReceived: " + distance);
+                        // Handle distance received
+                    }
+
+                    @Override
+                    public void onDistanceFailed() {
+                        // Handle distance request failure
+                    }
+
+                    @Override
+                    public void onClosestPointReceived(String closestPoint) {
+                        Log.d(TAG, "Closest point: " + closestPoint);
+                    }
+                });
 
             }
 
@@ -212,11 +236,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    ModelTram modelTram = dataSnapshot.getValue(ModelTram.class);
+                for (int i = 0;i<25;i++){
+
+                    ModelTram modelTram = snapshot.child(Integer.toString(i)).getValue(ModelTram.class);
                     String[] latlong =  modelTram.getCoordinates().split(",");
-                    double longitude = Double.parseDouble(latlong[0]);
-                    double latitude = Double.parseDouble(latlong[1]);
+                    destinations.add(modelTram.getCoordinates());
+                    double latitude = Double.parseDouble(latlong[0]);
+                    double  longitude = Double.parseDouble(latlong[1]);
                     LatLng latLng = new LatLng(latitude,longitude);
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(latLng).title(modelTram.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.piner));
