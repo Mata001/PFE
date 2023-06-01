@@ -471,23 +471,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
         mMap.addMarker(new MarkerOptions().position(location));
     }
-    private void closestStopStation() {
-        List<ModelTram> coordinates = new ArrayList<>();
-        ModelTram closestStopStation=null;
-        double closestDistance=Double.MAX_VALUE;
-           //for(ModelTram station : stations) /* farouk*/
-           {
-               // double distance = calculateDistance( ); /* farouk*/
-                if(distance<closestDistance){
-                    closestDistance= distance;
-                    closestStopStation=station;
-                }
-            }
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(castToLatLng(closestStopStation)).title("Closest "+ closestStopStation.getName()).icon(BitmapDescriptorFactory.HUE_MAGENTA);
-            mMap.addMarker(markerOptions);
-
-    }
+//    private void closestStopStation() {
+//        List<ModelTram> coordinates = new ArrayList<>();
+//        ModelTram closestStopStation=null;
+//        double closestDistance=Double.MAX_VALUE;
+//           //for(ModelTram station : stations) /* farouk*/
+//           {
+//               // double distance = calculateDistance( ); /* farouk*/
+//                if(distance<closestDistance){
+//                    closestDistance= distance;
+//                    closestStopStation=station;
+//                }
+//            }
+//            MarkerOptions markerOptions = new MarkerOptions();
+//            markerOptions.position(castToLatLng(closestStopStation)).title("Closest "+ closestStopStation.getName()).icon(BitmapDescriptorFactory.HUE_MAGENTA);
+//            mMap.addMarker(markerOptions);
+//
+//    }
     public LatLng castToLatLng(ModelTram modelTram){
         String[] latlong = modelTram.getCoordinates().split(",");
         double longitude = Double.parseDouble(latlong[0]);
