@@ -76,6 +76,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     DatabaseReference databaseReference;
     ArrayList <LatLng> listPoints;
     int i;
+    ArrayList<String> destinations;
+
+
     ArrayList <LatLng>locdest;
 
     @Override
@@ -84,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
         listPoints = new ArrayList<>();
         locdest = new ArrayList<>();
+        destinations = new ArrayList<>();
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -176,6 +180,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
                     taskRequestDirections.execute(url);
                 }
+                //------------------------------find closest point--------------------------------
+
+                ClosestPointFinder.findClosestPoint("Caféteria CHERGUI,6,Oran", destinations, new ClosestPointFinder.DistanceCallback() {
+                    @Override
+                    public void onDistanceReceived(int distance) {
+                        Log.d(TAG, "onDistanceReceived: " + distance);
+                        // Handle distance received
+                    }
+
+                    @Override
+                    public void onDistanceFailed() {
+                        // Handle distance request failure
+                    }
+
+                    @Override
+                    public void onClosestPointReceived(String closestPoint) {
+                        Log.d(TAG, "Closest point: " + closestPoint);
+                    }
+                });
 
             }
 
@@ -227,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                }
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     ModelTram modelTram = dataSnapshot.getValue(ModelTram.class);
+                    destinations.add(modelTram.getCoordinates());
                     LatLng latLng = castToLatLng(modelTram);
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(latLng).title(modelTram.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.piner));
@@ -471,23 +495,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
         mMap.addMarker(new MarkerOptions().position(location));
     }
-//    private void closestStopStation() {
-//        List<ModelTram> coordinates = new ArrayList<>();
-//        ModelTram closestStopStation=null;
-//        double closestDistance=Double.MAX_VALUE;
-//           //for(ModelTram station : stations) /* farouk*/
-//           {
-//               // double distance = calculateDistance( ); /* farouk*/
-//                if(distance<closestDistance){
-//                    closestDistance= distance;
-//                    closestStopStation=station;
-//                }
-//            }
-//            MarkerOptions markerOptions = new MarkerOptions();
-//            markerOptions.position(castToLatLng(closestStopStation)).title("Closest "+ closestStopStation.getName()).icon(BitmapDescriptorFactory.HUE_MAGENTA);
-//            mMap.addMarker(markerOptions);
-//
-//    }
     public LatLng castToLatLng(ModelTram modelTram){
         String[] latlong = modelTram.getCoordinates().split(",");
         double longitude = Double.parseDouble(latlong[0]);
@@ -495,6 +502,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng latLng = new LatLng(latitude,longitude);
         return latLng;
     }
-
 
 }
