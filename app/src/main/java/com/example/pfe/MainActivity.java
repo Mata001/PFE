@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 //------------------------------find closest point--------------------------------
 
-                ClosestPointFinder.findClosestPoint("Caféteria CHERGUI,6,Oran", destinations, new ClosestPointFinder.DistanceCallback() {
+                ClosestPointFinder.findClosestPoint(convertLatLongToString(place.getLatLng()), destinations, new ClosestPointFinder.DistanceCallback() {
                     @Override
                     public void onDistanceReceived(int distance) {
                         Log.d(TAG, "onDistanceReceived: " + distance);
@@ -231,25 +231,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //-------------------------------------------------
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        int start=8;
-        int end=15;
+        int start=0;
+        int end=25;
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 //                    DataSnapshot dataSnapshot = snapshot.getChildren();
-//                for ( i=start;i<end;i++)
-//                {
-//                    ModelTram modelTram = snapshot.child(Integer.toString(i)).getValue(ModelTram.class);
-//                    String[] latlong = modelTram.getCoordinates().split(",");
-//                    double longitude = Double.parseDouble(latlong[0]);
-//                    double latitude = Double.parseDouble(latlong[1]);
-//                    LatLng latLng = new LatLng(latitude, longitude);
-//                    MarkerOptions markerOptions = new MarkerOptions();
-//                    markerOptions.position(latLng).title(modelTram.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.piner));
-//                    mMap.addMarker(markerOptions).showInfoWindow();
+                for ( i=start;i<end;i++)
+                {
+                    ModelTram modelTram = snapshot.child(Integer.toString(i)).getValue(ModelTram.class);
 //                }
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    ModelTram modelTram = dataSnapshot.getValue(ModelTram.class);
+            //    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    //ModelTram modelTram = dataSnapshot.getValue(ModelTram.class);
                     destinations.add(modelTram.getCoordinates());
                     LatLng latLng = castToLatLng(modelTram);
                     MarkerOptions markerOptions = new MarkerOptions();
@@ -497,10 +490,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     public LatLng castToLatLng(ModelTram modelTram){
         String[] latlong = modelTram.getCoordinates().split(",");
-        double longitude = Double.parseDouble(latlong[0]);
-        double latitude = Double.parseDouble(latlong[1]);
+        double longitude = Double.parseDouble(latlong[1]);
+        double latitude = Double.parseDouble(latlong[0]);
         LatLng latLng = new LatLng(latitude,longitude);
         return latLng;
     }
-
+    public static String convertLatLongToString(LatLng latLng) {
+//        LatLng latLng = new LatLng(latitude,longitude);
+        String lat = Double.toString(latLng.latitude);
+        String longi = Double.toString(latLng.longitude);
+        return lat + "," + longi;
+    }
 }
