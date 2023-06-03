@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,11 +27,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Dot;
-import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -51,7 +47,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -185,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 //------------------------------find closest point--------------------------------
 
-                ClosestPointFinder.findClosestPoint(convertLatLongToString(place.getLatLng()), destinations, new ClosestPointFinder.DistanceCallback() {
+                ClosestPointFinder.findClosestPoint(latlngToString(place.getLatLng()), destinations, new ClosestPointFinder.DistanceCallback() {
                     @Override
                     public void onDistanceReceived(int distance) {
                         Log.d(TAG, "Distance to Destination: " + distance);
@@ -239,8 +234,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for (int i = 0;i<32;i++){
+//
 //                    DataSnapshot dataSnapshot = snapshot.getChildren();
-                for ( i=start;i<end;i++)
+                for (i=start;i<end;i++)
                 {
                     ModelTram modelTram = snapshot.child(Integer.toString(i)).getValue(ModelTram.class);
 //                }
@@ -313,8 +310,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Set value enable alternative ways
         String alt = "alternatives=TRUE";
         //Set waypoints those are the bus stations
-        String way = "waypoints=enc:clpxEppwByU~Z}}FfaDmQzF_WbHeU|EaTeFyL{BmESXuE~VaWn@ij@dC}InBuLuCkl@tKepAp@oy@u^_b@eAmfBgYs|@tZwRzNaB`QvS:";
-//        //Mode for find direction
+        String way = "waypoints=via:35.667992, -0.636142|via:35.671489, -0.629100";
+        //Mode for find direction
         String mode =  "mode=walking";
         //String key for api key
         String key = "key=AIzaSyBXqq6EL6IwRunjoA9r7ctDwzikEaN1FEE";
@@ -468,14 +465,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     locdest.add(currentLatLng);
 
 //                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(oran, 10));
-                    Toast.makeText(MainActivity.this, "hawala wayni "+currentLatLng, Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "location is : " + currentLatLng);
 //                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), 20));
-                    //------------------------------find closest point--------------------------------
+//------------------------------find closest point--------------------------------
 
-                    ClosestPointFinder.findClosestPoint(convertLatLongToString(currentLatLng), destinations, new ClosestPointFinder.DistanceCallback() {
+                    ClosestPointFinder.findClosestPoint(latlngToString(currentLatLng), destinations, new ClosestPointFinder.DistanceCallback() {
                         @Override
                         public void onDistanceReceived(int distance) {
-                            Log.d(TAG, "Distance to Current Location: " + distance);
+                            Log.d(TAG, "Shortest distance to current location " + distance);
                             // Handle distance received
                         }
 
@@ -486,13 +483,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         @Override
                         public void onClosestPointReceived(String closestPoint) {
-                            Log.d(TAG, "Closest point to Current Locations: " + closestPoint);
+                            Log.d(TAG, "Closest point to current location: " + closestPoint);
                         }
                     });
                 } else {
                     Toast.makeText(MainActivity.this, "Unable to get current location", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
     }
@@ -514,6 +510,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
         mMap.addMarker(new MarkerOptions().position(location));
     }
+    public String latlngToString(LatLng lg){
+    String stringlatlong = Double.toString(lg.latitude)+","+Double.toString(lg.longitude);
+    return stringlatlong;
+    }
     public LatLng castToLatLng(ModelTram modelTram){
         String[] latlong = modelTram.getCoordinates().split(",");
         double longitude = Double.parseDouble(latlong[1]);
@@ -521,10 +521,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng latLng = new LatLng(latitude,longitude);
         return latLng;
     }
-    public static String convertLatLongToString(LatLng latLng) {
-//        LatLng latLng = new LatLng(latitude,longitude);
-        String lat = Double.toString(latLng.latitude);
-        String longi = Double.toString(latLng.longitude);
-        return lat + "," + longi;
-    }
+
 }

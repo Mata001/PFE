@@ -6,6 +6,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import static java.lang.Math.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,17 +16,59 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClosestPointFinder {
+    private static final double EARTH_RADIUS = 6371.0;
     private static final String TAG = "ClosestPointFinder";
     private static final String API_KEY = "AIzaSyCnMasBoIdVpjj97TGyBUA44oC09BMxjUs";
+    private static final int DESTINATION_LIMIT = 25;
+    public static String origine;
 
     public static void findClosestPoint(String origin, List<String> destinations, DistanceCallback callback) {
-        String apiUrl = "https://maps.googleapis.com/maps/api/distancematrix/json";
+        origine = origin;
+        int numDestinations = destinations.size();
+        if (numDestinations <= DESTINATION_LIMIT) {
+            // If the number of destinations is within the limit, make a single request
+            makeDistanceRequest(origin, destinations, callback);
+        } else {
+            // If the number of destinations exceeds the limit, paginate through the results
+            List<List<String>> destinationChunks = chunkDestinations(destinations, DESTINATION_LIMIT);
+            List<String> closestPoints = new ArrayList<>();
+            AtomicInteger remainingRequests = new AtomicInteger(destinationChunks.size());
+
+            for (List<String> chunk : destinationChunks) {
+                makeDistanceRequest(origin, chunk, new DistanceCallback() {
+                    @Override
+                    public void onDistanceReceived(int distance) {
+
+                        // Handle distance received
+                    }
+
+                    @Override
+                    public void onDistanceFailed() {
+                        // Handle distance request failure
+                        remainingRequests.decrementAndGet();
+                        checkAllRequestsCompleted(callback, closestPoints, remainingRequests.get());
+                    }
+
+                    @Override
+                    public void onClosestPointReceived(String closestPoint) {
+                        closestPoints.add(closestPoint);
+                        remainingRequests.decrementAndGet();
+                        checkAllRequestsCompleted(callback, closestPoints, remainingRequests.get());
+                    }
+                });
+            }
+        }
+    }
+
+    private static void makeDistanceRequest(String origin, List<String> destinations, DistanceCallback callback) {
+        String apiUrl = "https://maps.googleapis.com/maps/api/distancematrix/json?mode=walking&";
         String destinationsString = TextUtils.join("|", destinations);
         String params = "key=" + API_KEY + "&origins=" + origin + "&destinations=" + destinationsString;
-        String url = apiUrl + "?" + params;
-        Log.d(TAG, "findClosestPoint: " + url);
+        String url = apiUrl + params;
+        Log.d(TAG, "makeDistanceRequest: URL = " +url);
 
         new DistanceMatrixTask(callback, destinations).execute(url);
     }
@@ -39,7 +82,6 @@ public class ClosestPointFinder {
             this.destinations = destinations;
         }
 
-        @Override
         protected String doInBackground(String... urls) {
             String result = null;
 
@@ -92,10 +134,10 @@ public class ClosestPointFinder {
                             closestIndex = i;
                         }
                     }
+                    Log.d(TAG, "closest index is "+ closestIndex);
 
                     if (closestIndex != -1) {
                         callback.onClosestPointReceived(destinations.get(closestIndex));
-                        callback.onDistanceReceived(minDistance);
                     } else {
                         callback.onDistanceFailed();
                     }
@@ -110,11 +152,74 @@ public class ClosestPointFinder {
         }
     }
 
-    public interface DistanceCallback {
-        void onDistanceReceived(int distance);
 
-        void onDistanceFailed();
+        private static List<List<String>> chunkDestinations(List<String> destinations, int chunkSize) {
+            List<List<String>> chunks = new ArrayList<>();
+            int numDestinations = destinations.size();
+            int numChunks = (int) Math.ceil((double) numDestinations / chunkSize);
 
-        void onClosestPointReceived(String closestPoint);
-    }
+            for (int i = 0; i < numChunks; i++) {
+                int startIndex = i * chunkSize;
+                int endIndex = Math.min((i + 1) * chunkSize, numDestinations);
+                List<String> chunk = destinations.subList(startIndex, endIndex);
+                chunks.add(chunk);
+            }
+
+            return chunks;
+        }
+
+        private static void checkAllRequestsCompleted(DistanceCallback callback, List<String> closestPoints, int remainingRequests) {
+            if (remainingRequests == 0) {
+                if (!closestPoints.isEmpty()) {
+                    String closestPoint = findClosestPoint(closestPoints);
+                    callback.onClosestPointReceived(closestPoint);
+                } else {
+                    callback.onDistanceFailed();
+                }
+            }
+        }
+
+        private static String findClosestPoint(List<String> points) {
+            double minDistance = Double.MAX_VALUE;
+            String closestPoint = null;
+
+            for (String point : points) {
+                double distance = calculateEuclideanDistance(origine, point);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestPoint = point;
+                }
+            }
+            return closestPoint;
+        }
+
+    private static double calculateEuclideanDistance(String point1, String point2) {
+        // Assuming the points are in latitude-longitude format (e.g., "latitude,longitude")
+        double lat1 = Double.parseDouble(point1.split(",")[0]);
+        double lon1 = Double.parseDouble(point1.split(",")[1]);
+        double lat2 = Double.parseDouble(point2.split(",")[0]);
+        double lon2 = Double.parseDouble(point2.split(",")[1]);
+
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1))
+                * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = EARTH_RADIUS * c;
+
+        return distance;
+        }
+
+        public interface DistanceCallback {
+            void onDistanceReceived(int distance);
+
+            void onDistanceFailed();
+
+            void onClosestPointReceived(String closestPoint);
+        }
+
 }
