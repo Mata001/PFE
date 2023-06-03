@@ -28,8 +28,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Dot;
+import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -185,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ClosestPointFinder.findClosestPoint(convertLatLongToString(place.getLatLng()), destinations, new ClosestPointFinder.DistanceCallback() {
                     @Override
                     public void onDistanceReceived(int distance) {
-                        Log.d(TAG, "onDistanceReceived: " + distance);
+                        Log.d(TAG, "Distance to Destination: " + distance);
                         // Handle distance received
                     }
 
@@ -196,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     @Override
                     public void onClosestPointReceived(String closestPoint) {
-                        Log.d(TAG, "Closest point: " + closestPoint);
+                        Log.d(TAG, "Closest point to Destination: " + closestPoint);
                     }
                 });
 
@@ -308,11 +311,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Value of destination
         String str_dest = "destination=" + dest.latitude+","+dest.longitude;
         //Set value enable alternative ways
-        String alt = "alternatives = TRUE";
+        String alt = "alternatives=TRUE";
         //Set waypoints those are the bus stations
-        String way = "waypoints=optimize:true|via:35.667992, -0.636142|via:35.671489, -0.629100";
-        //Mode for find direction
-        String mode =  "mode= driving";
+        String way = "waypoints=enc:clpxEppwByU~Z}}FfaDmQzF_WbHeU|EaTeFyL{BmESXuE~VaWn@ij@dC}InBuLuCkl@tKepAp@oy@u^_b@eAmfBgYs|@tZwRzNaB`QvS:";
+//        //Mode for find direction
+        String mode =  "mode=walking";
         //String key for api key
         String key = "key=AIzaSyBXqq6EL6IwRunjoA9r7ctDwzikEaN1FEE";
         //Build the full param
@@ -418,11 +421,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
 
                 polylineOptions.addAll(points);
-                polylineOptions.width(10f);
-                polylineOptions.color(Color.rgb(180, 247, 141));
+                polylineOptions.width(20f);
+                polylineOptions.color(Color.rgb(252, 3, 161));
                 polylineOptions.startCap(new RoundCap());
                 polylineOptions.jointType(1);
                 polylineOptions.geodesic(true);
+                List<PatternItem> pattern;
+                pattern = Arrays.asList(new Dot(),new Gap(30));
+                polylineOptions.pattern(pattern);
+
             }
 
             if (polylineOptions!=null) {
@@ -463,10 +470,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(oran, 10));
                     Toast.makeText(MainActivity.this, "hawala wayni "+currentLatLng, Toast.LENGTH_SHORT).show();
 //                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), 20));
+                    //------------------------------find closest point--------------------------------
 
+                    ClosestPointFinder.findClosestPoint(convertLatLongToString(currentLatLng), destinations, new ClosestPointFinder.DistanceCallback() {
+                        @Override
+                        public void onDistanceReceived(int distance) {
+                            Log.d(TAG, "Distance to Current Location: " + distance);
+                            // Handle distance received
+                        }
+
+                        @Override
+                        public void onDistanceFailed() {
+                            // Handle distance request failure
+                        }
+
+                        @Override
+                        public void onClosestPointReceived(String closestPoint) {
+                            Log.d(TAG, "Closest point to Current Locations: " + closestPoint);
+                        }
+                    });
                 } else {
                     Toast.makeText(MainActivity.this, "Unable to get current location", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
     }
