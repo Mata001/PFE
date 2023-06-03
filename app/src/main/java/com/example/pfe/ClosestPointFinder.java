@@ -134,6 +134,7 @@ public class ClosestPointFinder {
                             closestIndex = i;
                         }
                     }
+                    Log.d(TAG, "closest index is "+ closestIndex);
 
                     if (closestIndex != -1) {
                         callback.onClosestPointReceived(destinations.get(closestIndex));
