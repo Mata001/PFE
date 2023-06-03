@@ -183,10 +183,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 //------------------------------find closest point--------------------------------
 
-                ClosestPointFinder.findClosestPoint("Caféteria CHERGUI,6,Oran", destinations, new ClosestPointFinder.DistanceCallback() {
+                ClosestPointFinder.findClosestPoint(latlngToString(place.getLatLng()), destinations, new ClosestPointFinder.DistanceCallback() {
                     @Override
                     public void onDistanceReceived(int distance) {
-                        Log.d(TAG, "onDistanceReceived: " + distance);
+                        Log.d(TAG, "Shortest distance to destination: " + distance);
                         // Handle distance received
                     }
 
@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     @Override
                     public void onClosestPointReceived(String closestPoint) {
-                        Log.d(TAG, "Closest point: " + closestPoint);
+                        Log.d(TAG, "Closest point to destination: " + closestPoint);
                     }
                 });
 
@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (int i = 0;i<25;i++){
+                for (int i = 0;i<32;i++){
 
                     ModelTram modelTram = snapshot.child(Integer.toString(i)).getValue(ModelTram.class);
                     String[] latlong =  modelTram.getCoordinates().split(",");
@@ -307,11 +307,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Value of destination
         String str_dest = "destination=" + dest.latitude+","+dest.longitude;
         //Set value enable alternative ways
-        String alt = "alternatives = TRUE";
+        String alt = "alternatives=TRUE";
         //Set waypoints those are the bus stations
-        String way = "waypoints=optimize:true|via:35.667992, -0.636142|via:35.671489, -0.629100";
+        String way = "waypoints=via:35.667992, -0.636142|via:35.671489, -0.629100";
         //Mode for find direction
-        String mode =  "mode= driving";
+        String mode =  "mode=walking";
         //String key for api key
         String key = "key=AIzaSyBXqq6EL6IwRunjoA9r7ctDwzikEaN1FEE";
         //Build the full param
@@ -461,13 +461,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 //                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(oran, 10));
                     Toast.makeText(MainActivity.this, "hawala wayni "+currentLatLng, Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "location is : " + currentLatLng);
 //                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), 20));
+//------------------------------find closest point--------------------------------
 
+                    ClosestPointFinder.findClosestPoint(latlngToString(currentLatLng), destinations, new ClosestPointFinder.DistanceCallback() {
+                        @Override
+                        public void onDistanceReceived(int distance) {
+                            Log.d(TAG, "Shortest distance to current location " + distance);
+                            // Handle distance received
+                        }
+
+                        @Override
+                        public void onDistanceFailed() {
+                            // Handle distance request failure
+                        }
+
+                        @Override
+                        public void onClosestPointReceived(String closestPoint) {
+                            Log.d(TAG, "Closest point to current location: " + closestPoint);
+                        }
+                    });
                 } else {
                     Toast.makeText(MainActivity.this, "Unable to get current location", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
+
     }
 
     @Override
@@ -487,6 +508,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
         mMap.addMarker(new MarkerOptions().position(location));
     }
-
+public String latlngToString(LatLng lg){
+    String stringlatlong = Double.toString(lg.latitude)+","+Double.toString(lg.longitude);
+return stringlatlong;
+}
 
 }
