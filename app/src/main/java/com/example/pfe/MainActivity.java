@@ -187,14 +187,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
 
                     @Override
-                    public void onClosestPointReceived(String closestPoint,int index) {
-                        EClosestIndex = 12;
-                        Log.d(TAG, "Closest point to Destination: " + closestPoint);
+                    public void onClosestPointReceived(String closestPoint) {
+                        EClosestIndex = destinations.indexOf(closestPoint);
+                        Log.d(TAG, "index ta destination" + EClosestIndex);
+                        Log.d(TAG, "Closest point to Destination: " + closestPoint );
                         requestPolyline( castStringToLatLng(closestPoint), destToClose);
+                        for (int j=SClosestIndex+1; j<EClosestIndex; j++){
+                            waypoints.add(destinations.get(j));
+
+                        }
+                        requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)) , locdest);
+                        Log.d(TAG, "waypoints arraylist: " +waypoints);
                     }
                 });
-
             }
+
 
 
             @Override
@@ -207,10 +214,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         databaseReference = FirebaseDatabase.getInstance().getReference("features");
 //        ----------------------------- Waypoints creation
-        for (i=SClosestIndex+1; i<EClosestIndex; i++){
-            waypoints.add(destinations.get(i));
-        }
-        Log.d(TAG, "waypoints arraylist: " +waypoints);
+
     }
 
     //-------------------Tap twice to exit------------------------
@@ -230,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         int start=0;
-        int end=25;
+        int end=32;
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -249,6 +253,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     markerOptions.position(latLng).title(modelTram.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.piner));
                     mMap.addMarker(markerOptions).showInfoWindow();
                 }
+                Log.d(TAG, "destination arraylist " + destinations);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -460,10 +465,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     // Move the camera to the user's current location
                     LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                     moveCameraToLocation(currentLatLng,15);
-                    if (locdest.size() > 0) {
-                        locdest.clear();
-                    }
-                    locdest.add(currentLatLng);
                     if (locToClose.size() > 0) {
                         locToClose.clear();
                     }
@@ -488,10 +489,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
 
                         @Override
-                        public void onClosestPointReceived(String closestPoint, int index) {
-                            SClosestIndex = 5;
+                        public void onClosestPointReceived(String closestPoint) {
+                            SClosestIndex =destinations.indexOf(closestPoint);
+                            Log.d(TAG, " index Start "+ SClosestIndex);
                             Log.d(TAG, "Closest point to current location: " + closestPoint);
                            requestPolyline( castStringToLatLng(closestPoint), locToClose);
+                            if (locdest.size() > 0) {
+                                locdest.clear();
+                            }
+                            locdest.add(castStringToLatLng(destinations.get(SClosestIndex)));
                         }
                     });
                 } else {

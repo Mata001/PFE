@@ -54,8 +54,7 @@ public class ClosestPointFinder {
                     }
 
                     @Override
-                    public void onClosestPointReceived(String closestPoint, int index) {
-                        closestIndex=index;
+                    public void onClosestPointReceived(String closestPoint) {
                         closestPoints.add(closestPoint);
                         remainingRequests.decrementAndGet();
                         checkAllRequestsCompleted(callback, closestPoints, remainingRequests.get());
@@ -136,10 +135,10 @@ public class ClosestPointFinder {
                             closestIndex = i;
                         }
                     }
-                    Log.d(TAG, "closest index is "+ closestIndex);
+
 
                     if (closestIndex != -1) {
-                        callback.onClosestPointReceived(destinations.get(closestIndex),closestIndex);
+                        callback.onClosestPointReceived(destinations.get(closestIndex));
                     } else {
                         callback.onDistanceFailed();
                     }
@@ -174,7 +173,7 @@ public class ClosestPointFinder {
             if (remainingRequests == 0) {
                 if (!closestPoints.isEmpty()) {
                     String closestPoint = findClosestPoint(closestPoints);
-                    callback.onClosestPointReceived(closestPoint, closestPoints.indexOf(closestPoint));
+                    callback.onClosestPointReceived(closestPoint);
                 } else {
                     callback.onDistanceFailed();
                 }
@@ -192,6 +191,7 @@ public class ClosestPointFinder {
                     closestPoint = point;
                 }
             }
+
             return closestPoint;
         }
 
@@ -221,7 +221,7 @@ public class ClosestPointFinder {
 
             void onDistanceFailed();
 
-            void onClosestPointReceived(String closestPoint, int index);
+            void onClosestPointReceived(String closestPoint);
         }
 
 }
