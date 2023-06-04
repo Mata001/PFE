@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -27,8 +28,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Dot;
+import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -75,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ArrayList <LatLng> listPoints;
     int i;
     ArrayList<String> destinations;
+    ArrayList<LatLng> locToClose;
+    ArrayList<LatLng> destToClose;
 
 
     ArrayList <LatLng>locdest;
@@ -86,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         listPoints = new ArrayList<>();
         locdest = new ArrayList<>();
         destinations = new ArrayList<>();
+        locToClose = new ArrayList<>();
+        destToClose = new ArrayList<>();
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -147,37 +155,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
-                mMap.clear();
+                //mMap.clear();
                 Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
                 Toast.makeText(MainActivity.this, "ok " + place.getLatLng(), Toast.LENGTH_SHORT).show();
                 //MarkerOptions markerOptions = new MarkerOptions();
                 //markerOptions.position(place.getLatLng());
                 //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
                 //mMap.addMarker(markerOptions);
+                if (destToClose.size() > 0) {
+                    destToClose.clear();
+                }
+                destToClose.add(place.getLatLng());
                 moveCameraToLocation(place.getLatLng(), 15);
-                if (locdest.size() == 2) {
-                    locdest.clear();
-                    mMap.clear();
-                }
-                locdest.add(place.getLatLng());
-                //Create marker
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(place.getLatLng());
-                if (locdest.size() == 1) {
-                    //Add first marker to the map
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                } else {
-                    //Add second marker to the map
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-                }
-                mMap.addMarker(markerOptions);
 
-                if (locdest.size() == 2) {
-                    //Create the URL to get request from first marker to second marker
-                    String url = getRequestUrl(locdest.get(0), locdest.get(1));
-                    TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
-                    taskRequestDirections.execute(url);
-                }
                 //------------------------------find closest point--------------------------------
 
                 ClosestPointFinder.findClosestPoint(latlngToString(place.getLatLng()), destinations, new ClosestPointFinder.DistanceCallback() {
@@ -195,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onClosestPointReceived(String closestPoint) {
                         Log.d(TAG, "Closest point to Destination: " + closestPoint);
+                        requestPolyline( castStringToLatLng(closestPoint), destToClose);
                     }
                 });
 
@@ -424,7 +415,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 polylineOptions.jointType(1);
                 polylineOptions.geodesic(true);
                 List<PatternItem> pattern;
-                pattern = Arrays.asList(new Dot(),new Gap(30));
+                pattern = Arrays.asList(new Dot(), new Gap(30));
                 polylineOptions.pattern(pattern);
 
             }
@@ -458,11 +449,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (location != null) {
                     // Move the camera to the user's current location
                     LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    moveCameraToLocation(currentLatLng,10);
+                    moveCameraToLocation(currentLatLng,15);
                     if (locdest.size() > 0) {
                         locdest.clear();
                     }
                     locdest.add(currentLatLng);
+                    if (locToClose.size() > 0) {
+                        locToClose.clear();
+                    }
+                    locToClose.add(currentLatLng);
+
 
 //                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(oran, 10));
                     Log.d(TAG, "location is : " + currentLatLng);
@@ -484,8 +480,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         @Override
                         public void onClosestPointReceived(String closestPoint) {
                             Log.d(TAG, "Closest point to current location: " + closestPoint);
+                           requestPolyline( castStringToLatLng(closestPoint), locToClose);
                         }
                     });
+
                 } else {
                     Toast.makeText(MainActivity.this, "Unable to get current location", Toast.LENGTH_SHORT).show();
                 }
@@ -520,6 +518,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         double latitude = Double.parseDouble(latlong[0]);
         LatLng latLng = new LatLng(latitude,longitude);
         return latLng;
+    }
+    public LatLng castStringToLatLng(String string){
+        String[] latlong = string.split(",");
+        double longitude = Double.parseDouble(latlong[1]);
+        double latitude = Double.parseDouble(latlong[0]);
+        LatLng latLng = new LatLng(latitude,longitude);
+        return latLng;
+    }
+
+    public void requestPolyline(LatLng latLng , ArrayList<LatLng> lol) {
+        //Reset marker when already 2
+        if (lol.size() == 2) {
+            lol.clear();
+            mMap.clear();
+        }
+        //Save first point select
+        lol.add(latLng);
+        //Create marker
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+
+        if (lol.size() == 1) {
+            //Add first marker to the map
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        } else {
+            //Add second marker to the map
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        }
+        mMap.addMarker(markerOptions);
+
+        if (lol.size() == 2) {
+            //Create the URL to get request from first marker to second marker
+            String url = getRequestUrl(lol.get(0), lol.get(1));
+            TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
+            taskRequestDirections.execute(url);
+        }
     }
 
 }
