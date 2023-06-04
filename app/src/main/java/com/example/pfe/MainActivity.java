@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -27,8 +28,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Dot;
+import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -75,8 +79,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ArrayList <LatLng> listPoints;
     int i;
     ArrayList<String> destinations;
-
-
+    int SClosestIndex;
+    int EClosestIndex;
+    List<String> waypoints;
     ArrayList <LatLng>locdest;
 
     @Override
@@ -86,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         listPoints = new ArrayList<>();
         locdest = new ArrayList<>();
         destinations = new ArrayList<>();
+        waypoints = new ArrayList<>();
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -193,7 +199,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
 
                     @Override
-                    public void onClosestPointReceived(String closestPoint) {
+                    public void onClosestPointReceived(String closestPoint,int index) {
+                        EClosestIndex = 12;
                         Log.d(TAG, "Closest point to Destination: " + closestPoint);
                     }
                 });
@@ -210,7 +217,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        ----------
 
         databaseReference = FirebaseDatabase.getInstance().getReference("features");
-
+//        ----------------------------- Waypoints creation
+        for (i=SClosestIndex+1; i<EClosestIndex; i++){
+            waypoints.add(destinations.get(i));
+        }
+        Log.d(TAG, "waypoints arraylist: " +waypoints);
     }
 
     //-------------------Tap twice to exit------------------------
@@ -230,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         int start=0;
-        int end=25;
+        int end=32;
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -303,6 +314,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private String getRequestUrl(LatLng origin, LatLng dest) {
+        String waypointsString = TextUtils.join("|via:", waypoints);
         //Value of origin
         String str_org = "origin=" + origin.latitude +","+origin.longitude;
         //Value of destination
@@ -310,14 +322,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Set value enable alternative ways
         String alt = "alternatives=TRUE";
         //Set waypoints those are the bus stations
-        String way = "waypoints=via:35.667992, -0.636142|via:35.671489, -0.629100";
+        String way = "waypoints=" + waypointsString;
         //Mode for find direction
         String mode =  "mode=walking";
         //String key for api key
         String key = "key=AIzaSyBXqq6EL6IwRunjoA9r7ctDwzikEaN1FEE";
         //Build the full param
         String param = alt +"&"+ str_org +"&" +mode +"&"+ str_dest +
-                //"&"+ way+
+                "&"+ way+
                 "&" +key;
         //Output format
         String output = "json";
@@ -482,7 +494,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
 
                         @Override
-                        public void onClosestPointReceived(String closestPoint) {
+                        public void onClosestPointReceived(String closestPoint, int index) {
+                            SClosestIndex = 5;
                             Log.d(TAG, "Closest point to current location: " + closestPoint);
                         }
                     });

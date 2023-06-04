@@ -24,7 +24,8 @@ public class ClosestPointFinder {
     private static final String API_KEY = "AIzaSyCnMasBoIdVpjj97TGyBUA44oC09BMxjUs";
     private static final int DESTINATION_LIMIT = 25;
     public static String origine;
-
+    public static List<String> waypoints ;
+    public static int closestIndex = -1;
     public static void findClosestPoint(String origin, List<String> destinations, DistanceCallback callback) {
         origine = origin;
         int numDestinations = destinations.size();
@@ -53,7 +54,8 @@ public class ClosestPointFinder {
                     }
 
                     @Override
-                    public void onClosestPointReceived(String closestPoint) {
+                    public void onClosestPointReceived(String closestPoint, int index) {
+                        closestIndex=index;
                         closestPoints.add(closestPoint);
                         remainingRequests.decrementAndGet();
                         checkAllRequestsCompleted(callback, closestPoints, remainingRequests.get());
@@ -122,7 +124,7 @@ public class ClosestPointFinder {
                     JSONArray elements = row.getJSONArray("elements");
 
                     int minDistance = Integer.MAX_VALUE;
-                    int closestIndex = -1;
+
 
                     for (int i = 0; i < elements.length(); i++) {
                         JSONObject element = elements.getJSONObject(i);
@@ -137,7 +139,7 @@ public class ClosestPointFinder {
                     Log.d(TAG, "closest index is "+ closestIndex);
 
                     if (closestIndex != -1) {
-                        callback.onClosestPointReceived(destinations.get(closestIndex));
+                        callback.onClosestPointReceived(destinations.get(closestIndex),closestIndex);
                     } else {
                         callback.onDistanceFailed();
                     }
@@ -172,7 +174,7 @@ public class ClosestPointFinder {
             if (remainingRequests == 0) {
                 if (!closestPoints.isEmpty()) {
                     String closestPoint = findClosestPoint(closestPoints);
-                    callback.onClosestPointReceived(closestPoint);
+                    callback.onClosestPointReceived(closestPoint, closestPoints.indexOf(closestPoint));
                 } else {
                     callback.onDistanceFailed();
                 }
@@ -219,7 +221,7 @@ public class ClosestPointFinder {
 
             void onDistanceFailed();
 
-            void onClosestPointReceived(String closestPoint);
+            void onClosestPointReceived(String closestPoint, int index);
         }
 
 }
