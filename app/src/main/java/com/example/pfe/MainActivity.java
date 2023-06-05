@@ -63,12 +63,9 @@ import java.util.HashMap;
 import java.util.List;
 
 
-
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
-
-
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    private static String TAG="info:";
+    private static String TAG = "info:";
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationManager locationManager;
@@ -76,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private long mPressed;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
-    ArrayList <LatLng> listPoints;
+    ArrayList<LatLng> listPoints;
     int i;
     int wpptNb;
     ArrayList<String> destinations;
@@ -86,15 +83,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     List<String> waypoints1;
     List<String> waypoints2;
     List<String> wayppt;
-
-
     ArrayList<LatLng> locToClose;
     ArrayList<LatLng> destToClose;
     List<String> empty;
-
-    ArrayList <LatLng> locdest;
-    ArrayList <LatLng> locdest1;
-    ArrayList <LatLng> locdest2;
+    ArrayList<LatLng> locdest;
+    ArrayList<LatLng> locdest1;
+    ArrayList<LatLng> locdest2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,15 +146,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
 //----------------------------------Go next Activity----------------------------
         // Initialize Places.
-        if(!Places.isInitialized()) {
+        if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), "AIzaSyCnMasBoIdVpjj97TGyBUA44oC09BMxjUs");
         }
 // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
 
         // Initialize the AutocompleteSupportFragment.
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(
                 new LatLng(35.604562, -0.748931),
                 new LatLng(35.788521, -0.501718)));
@@ -190,7 +183,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //------------------------------find closest point--------------------------------
 
                 ClosestPointFinder.findClosestPoint(latlngToString(place.getLatLng()), destinations, new ClosestPointFinder.DistanceCallback() {
-                    String TAG =" ";
+                    String TAG = " ";
+
                     @Override
                     public void onDistanceReceived(int distance) {
                         Log.d(TAG, "Distance to Destination: " + distance);
@@ -206,82 +200,49 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     public void onClosestPointReceived(String closestPoint) {
                         EClosestIndex = destinations.indexOf(closestPoint);
                         Log.d(TAG, "index ta destination" + EClosestIndex);
-                        Log.d(TAG, "Closest point to Destination: " + closestPoint );
-                        requestPolyline(castStringToLatLng(closestPoint), destToClose ,empty);
-                        wpptNb =EClosestIndex-SClosestIndex-1;
+                        Log.d(TAG, "Closest point to Destination: " + closestPoint);
+                        requestPolyline(castStringToLatLng(closestPoint), destToClose, empty);
+                        wpptNb = EClosestIndex - SClosestIndex - 1;
 
 
-
-                            if (wpptNb<23) {
-                                for (int j = SClosestIndex + 1; j < EClosestIndex; j++) {
-                                    waypoints.add(destinations.get(j));
-                                }
-                                Log.d(TAG, "wahd "+waypoints);
-                                if (locdest.size() > 0) {
-                                    locdest.clear();
-                                } locdest.add(castStringToLatLng(waypoints.get(0)));
-                                requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)) , locdest , waypoints);
+                        if (wpptNb < 23) {
+                            for (int j = SClosestIndex + 1; j < EClosestIndex; j++) {
+                                waypoints.add(destinations.get(j));
+                            }
+                            Log.d(TAG, "wahd " + waypoints);
+                            if (locdest.size() > 0) {
+                                locdest.clear();
+                            }
+                            locdest.add(castStringToLatLng(waypoints.get(0)));
+                            requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest, waypoints);
+                        } else {
+                            for (int m = SClosestIndex + 1; m < SClosestIndex + 24; m++) {
+                                waypoints1.add(destinations.get(m));
+                            }
+                            for (int n = SClosestIndex + 25; n < EClosestIndex - 1; n++) {
+                                waypoints2.add(destinations.get(n));
                             }
 
-
-                            else {
-                                for (int m=SClosestIndex+1 ; m< SClosestIndex+24; m++){
-                                    waypoints1.add(destinations.get(m));
-                                }
-                                for (int n=SClosestIndex+25; n<EClosestIndex-1 ;n++){
-                                    waypoints2.add(destinations.get(n));
-                                }
-
-                                Log.d(TAG, "lowl "+waypoints1);
-                                Log.d(TAG, "tani "+waypoints2);
-                                if (locdest1.size() > 0) {
-                                    locdest1.clear();
-                                } locdest1.add(castStringToLatLng(destinations.get(SClosestIndex)));
-
-                                if (locdest2.size() > 0) {
-                                    locdest2.clear();
-                                } locdest2.add(castStringToLatLng(destinations.get(SClosestIndex+24)));
-
-                                wayppt = waypoints1;
-                                requestPolyline(castStringToLatLng(destinations.get(SClosestIndex+24)) , locdest1 , waypoints1);
-                                wayppt = waypoints2;
-                                requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)) , locdest2 , waypoints2);
+                            Log.d(TAG, "lowl " + waypoints1);
+                            Log.d(TAG, "tani " + waypoints2);
+                            if (locdest1.size() > 0) {
+                                locdest1.clear();
                             }
-//                                    Log.d(TAG, "zenji 1"+waypoints2);
-//                                    Log.d(TAG, "zenji 2"+waypoints3);
+                            locdest1.add(castStringToLatLng(destinations.get(SClosestIndex)));
 
+                            if (locdest2.size() > 0) {
+                                locdest2.clear();
+                            }
+                            locdest2.add(castStringToLatLng(destinations.get(SClosestIndex + 24)));
 
+                            wayppt = waypoints1;
+                            requestPolyline(castStringToLatLng(destinations.get(SClosestIndex + 24)), locdest1, waypoints1);
+                            wayppt = waypoints2;
+                            requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest2, waypoints2);
                         }
-//                        }else {
-
-//                            Log.d(TAG, "weeeeeeeeeeeeeeeeeeeeeeeeeeeeeee " + waypoints.get(22));
-//                            if (locdest.size() > 0) {
-//                                locdest.clear();
-//                            }
-//
-//                            waypoints.clear();
-
-//                            requestPolyline(castStringToLatLng(waypoints.get(0)) , locdest);
-//                            Log.d(TAG, "onClosestPointReceived: papa "+ waypoints2);
-
-//                            locdest.add(castStringToLatLng(waypoints.get(0)));
-
-//                            Log.d(TAG, "onClosestPointReceived: papa "+ waypoints2.get(0));
-
-//                            requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest);
-
-
-
-
-//                    }
-//                        requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)) , locdest , waypoints);
-//                        Log.d(TAG, "waypoints arraylist: " +waypoints);
-//                    }
+                    }
                 });
-
             }
-
-
 
             @Override
             public void onError(@NonNull Status status) {
@@ -290,10 +251,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 //        ----------
-
         databaseReference = FirebaseDatabase.getInstance().getReference("features");
 //        ----------------------------- Waypoints creation
-
     }
 
     //-------------------Tap twice to exit------------------------
@@ -308,23 +267,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mPressed = System.currentTimeMillis();
     }
 
-     //--------------------------------------------------
+    //--------------------------------------------------
 //-------------------------------------------------
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        int start=0;
-        int end=31;
+        int start = 0;
+        int end = 31;
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 //                for (int i = 0;i<32;i++){
 //
 //                    DataSnapshot dataSnapshot = snapshot.getChildren();
-                for (i=start;i<end;i++)
-                {
+                for (i = start; i < end; i++) {
                     ModelTram modelTram = snapshot.child(Integer.toString(i)).getValue(ModelTram.class);
 //                }
-            //    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    //    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     //ModelTram modelTram = dataSnapshot.getValue(ModelTram.class);
                     destinations.add(modelTram.getCoordinates());
                     LatLng latLng = castToLatLng(modelTram);
@@ -334,6 +292,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 Log.d(TAG, "destination arraylist " + destinations);
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
@@ -359,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //Reset marker when already 2
                 if (listPoints.size() == 2) {
                     listPoints.clear();
-                mMap.clear();
+                    mMap.clear();
                 }
                 //Save first point select
                 listPoints.add(latLng);
@@ -378,46 +337,47 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 if (listPoints.size() == 2) {
                     //Create the URL to get request from first marker to second marker
-                    String url = getRequestUrl(listPoints.get(0), listPoints.get(1) , wayppt);
+                    String url = getRequestUrl(listPoints.get(0), listPoints.get(1), wayppt);
                     TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
                     taskRequestDirections.execute(url);
                 }
             }
-        } );
+        });
     }
 
-    private String getRequestUrl(LatLng origin, LatLng dest , List<String> wayppt) {
+    private String getRequestUrl(LatLng origin, LatLng dest, List<String> wayppt) {
         String waypointsString = TextUtils.join("|via:", wayppt);
         //Value of origin
-        String str_org = "origin=" + origin.latitude +","+origin.longitude;
+        String str_org = "origin=" + origin.latitude + "," + origin.longitude;
         //Value of destination
-        String str_dest = "destination=" + dest.latitude+","+dest.longitude;
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
         //Set value enable alternative ways
         String alt = "alternatives=TRUE";
         //Set waypoints those are the bus stations
         String way = "waypoints=" + waypointsString;
         //Mode for find direction
-        String mode =  "mode=walking";
+        String mode = "mode=walking";
         //String key for api key
         String key = "key=AIzaSyBXqq6EL6IwRunjoA9r7ctDwzikEaN1FEE";
         //Build the full param
-        String param = alt +"&"+ str_org +"&" +mode +"&"+ str_dest +
-                "&"+ way+
-                "&" +key;
+        String param = alt + "&" + str_org + "&" + mode + "&" + str_dest +
+                "&" + way +
+                "&" + key;
         //Output format
         String output = "json";
         //Create url to request
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + param;
-        Log.d(TAG, "waypoints requested "+ url);
+        Log.d(TAG, "waypoints requested " + url);
         wayppt.clear();
 
         return url;
     }
+
     private String requestDirection(String reqUrl) throws Exception {
         String responseString = "";
         InputStream inputStream = null;
         HttpURLConnection httpURLConnection = null;
-        try{
+        try {
             URL url = new URL(reqUrl);
             httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.connect();
@@ -448,6 +408,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         System.out.println(responseString);
         return responseString;
     }
+
     public class TaskRequestDirections extends AsyncTask<String, Void, String> {
 
         @Override
@@ -458,7 +419,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return  responseString;
+            return responseString;
 
         }
 
@@ -470,7 +431,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             taskParser.execute(s);
         }
     }
-    public class TaskParser extends AsyncTask<String, Void, List<List<HashMap<String, String>>> > {
+
+    public class TaskParser extends AsyncTask<String, Void, List<List<HashMap<String, String>>>> {
 
         @Override
         protected List<List<HashMap<String, String>>> doInBackground(String... strings) {
@@ -502,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     double lat = Double.parseDouble(point.get("lat"));
                     double lon = Double.parseDouble(point.get("lon"));
 
-                    points.add(new LatLng(lat,lon));
+                    points.add(new LatLng(lat, lon));
                 }
 
                 polylineOptions.addAll(points);
@@ -512,12 +474,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 polylineOptions.jointType(1);
                 polylineOptions.geodesic(true);
                 List<PatternItem> pattern;
-                pattern = Arrays.asList(new Dot(),new Gap(30));
+                pattern = Arrays.asList(new Dot(), new Gap(30));
                 polylineOptions.pattern(pattern);
 
             }
 
-            if (polylineOptions!=null) {
+            if (polylineOptions != null) {
                 mMap.addPolyline(polylineOptions);
             } else {
                 Toast.makeText(getApplicationContext(), "Direction not found!", Toast.LENGTH_SHORT).show();
@@ -546,7 +508,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (location != null) {
                     // Move the camera to the user's current location
                     LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    moveCameraToLocation(currentLatLng,15);
+                    moveCameraToLocation(currentLatLng, 15);
                     if (locToClose.size() > 0) {
                         locToClose.clear();
                     }
@@ -572,10 +534,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         @Override
                         public void onClosestPointReceived(String closestPoint) {
-                            SClosestIndex =destinations.indexOf(closestPoint);
-                            Log.d(TAG, " index Start "+ SClosestIndex);
+                            SClosestIndex = destinations.indexOf(closestPoint);
+                            Log.d(TAG, " index Start " + SClosestIndex);
                             Log.d(TAG, "Closest point to current location: " + closestPoint);
-                           requestPolyline( castStringToLatLng(closestPoint), locToClose , empty);
+                            requestPolyline(castStringToLatLng(closestPoint), locToClose, empty);
                         }
                     });
                 } else {
@@ -598,30 +560,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
+
     private void moveCameraToLocation(LatLng location, float zoom) {
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
         mMap.addMarker(new MarkerOptions().position(location));
     }
-    public String latlngToString(LatLng lg){
-    String stringlatlong = Double.toString(lg.latitude)+","+Double.toString(lg.longitude);
-    return stringlatlong;
+
+    public String latlngToString(LatLng lg) {
+        String stringlatlong = Double.toString(lg.latitude) + "," + Double.toString(lg.longitude);
+        return stringlatlong;
     }
-    public LatLng castToLatLng(ModelTram modelTram){
+
+    public LatLng castToLatLng(ModelTram modelTram) {
         String[] latlong = modelTram.getCoordinates().split(",");
         double longitude = Double.parseDouble(latlong[1]);
         double latitude = Double.parseDouble(latlong[0]);
-        LatLng latLng = new LatLng(latitude,longitude);
-        return latLng;
-    }
-    public LatLng castStringToLatLng(String string){
-        String[] latlong = string.split(",");
-        double longitude = Double.parseDouble(latlong[1]);
-        double latitude = Double.parseDouble(latlong[0]);
-        LatLng latLng = new LatLng(latitude,longitude);
+        LatLng latLng = new LatLng(latitude, longitude);
         return latLng;
     }
 
-    public void requestPolyline(LatLng latLng , ArrayList<LatLng> lol, List<String> wayppt) {
+    public LatLng castStringToLatLng(String string) {
+        String[] latlong = string.split(",");
+        double longitude = Double.parseDouble(latlong[1]);
+        double latitude = Double.parseDouble(latlong[0]);
+        LatLng latLng = new LatLng(latitude, longitude);
+        return latLng;
+    }
+
+    public void requestPolyline(LatLng latLng, ArrayList<LatLng> lol, List<String> wayppt) {
         //Reset marker when already 2
         if (lol.size() == 2) {
             lol.clear();
