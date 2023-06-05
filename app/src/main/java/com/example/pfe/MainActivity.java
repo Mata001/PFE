@@ -78,16 +78,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     DatabaseReference databaseReference;
     ArrayList <LatLng> listPoints;
     int i;
+    int wpptNb;
     ArrayList<String> destinations;
     int SClosestIndex;
     int EClosestIndex;
     List<String> waypoints;
+    List<String> waypoints2;
+    List<String> waypoints3;
+
     ArrayList<LatLng> locToClose;
     ArrayList<LatLng> destToClose;
     List<String> empty;
 
-
-    ArrayList <LatLng>locdest;
+    ArrayList <LatLng> locdest;
+    ArrayList <LatLng> locdest1;
+    ArrayList <LatLng> locdest2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,11 +100,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
         listPoints = new ArrayList<>();
         locdest = new ArrayList<>();
+        locdest1 = new ArrayList<>();
+        locdest2 = new ArrayList<>();
+
         destinations = new ArrayList<>();
         locToClose = new ArrayList<>();
         destToClose = new ArrayList<>();
         waypoints = new ArrayList<>();
-        empty = new ArrayList<>();
+        waypoints2 = new ArrayList<>();
+        waypoints3 = new ArrayList<>();
+
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -194,31 +204,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Log.d(TAG, "index ta destination" + EClosestIndex);
                         Log.d(TAG, "Closest point to Destination: " + closestPoint );
                         requestPolyline( castStringToLatLng(closestPoint), destToClose ,empty);
-                        for (int j=SClosestIndex+1; j<EClosestIndex; j++){
-                            waypoints.add(destinations.get(j));
-                    }
-
-                        for (int m=0;m<23;m++){
-                            waypoints2.add(waypoints.get(m));
-                            Log.d(TAG, "zenji " +m +"  "+waypoints2);
-                        }
-                        Log.d(TAG, "lowl "+ waypoints2);
-//                        requestPolyline(castStringToLatLng(waypoints2.get(22)),locdest2));
-
-                        if (locdest2.size() > 0) {
-                                locdest2.clear();
-                            }
-                        locdest2.add(castStringToLatLng(waypoints.get(22)));
-
-
-                        for (int n=23;n<EClosestIndex+SClosestIndex;n++){
-                            waypoints3.add(waypoints.get(n));
-                            Log.d(TAG, "zenji " +n +"  "+waypoints3);
-                        }
-                        Log.d(TAG, "tani "+ waypoints3);
-                        //Log.d(TAG, "onClosestPointReceived: " +waypoints.get(23));
-                        requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest2);
-//                            Log.d(TAG, "onClosestPointReceived: 2222222222222 " + waypoints.size());
 //                        }else {
 
 //                            Log.d(TAG, "weeeeeeeeeeeeeeeeeeeeeeeeeeeeeee " + waypoints.get(22));
@@ -240,12 +225,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         }
 
-//                        Log.d(TAG, "waypoints arraylist: " +waypoints2);
 //                    }
-                        requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)) , locdest , waypoints);
-                        Log.d(TAG, "waypoints arraylist: " +waypoints);
-                    }
+//                        requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)) , locdest , waypoints);
+//                        Log.d(TAG, "waypoints arraylist: " +waypoints);
+//                    }
                 });
+
+//                wpptNb = SClosestIndex+EClosestIndex - 1;
+//                for (int j=SClosestIndex+1; j<EClosestIndex; j++){
+//                    if (wpptNb<23){
+//                        waypoints.add(destinations.get(j));
+//                    }
+//                    else {
+//                        for (int m=0;m<23;m++){
+//                            waypoints2.add(destinations.get(m));
+//                            Log.d(TAG, "zenji " +m +"  "+waypoints2);
+//                        }
+//                        for (int n=23;n<EClosestIndex+SClosestIndex;n++){
+//                            waypoints3.add(destinations.get(n));
+//                            Log.d(TAG, "zenji " +n +"  "+waypoints3);
+//                        }
+//
+//                    }
+//                }
             }
 
 
@@ -541,10 +543,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Log.d(TAG, " index Start "+ SClosestIndex);
                             Log.d(TAG, "Closest point to current location: " + closestPoint);
                            requestPolyline( castStringToLatLng(closestPoint), locToClose , empty);
-                            if (locdest.size() > 0) {
-                                locdest.clear();
-                            }
-                            locdest1.add(castStringToLatLng(destinations.get(SClosestIndex)));
                         }
                     });
                 } else {
