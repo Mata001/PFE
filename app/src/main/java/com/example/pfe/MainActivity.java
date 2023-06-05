@@ -82,30 +82,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     int SClosestIndex;
     int EClosestIndex;
     List<String> waypoints;
-    List<String> waypoints2;
-    List<String> waypoints3;
-
     ArrayList<LatLng> locToClose;
     ArrayList<LatLng> destToClose;
+    List<String> empty;
 
 
-    ArrayList <LatLng>locdest1;
-    ArrayList <LatLng>locdest2;
+    ArrayList <LatLng>locdest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         listPoints = new ArrayList<>();
-        locdest1 = new ArrayList<>();
-        locdest2 = new ArrayList<>();
+        locdest = new ArrayList<>();
         destinations = new ArrayList<>();
         locToClose = new ArrayList<>();
         destToClose = new ArrayList<>();
         waypoints = new ArrayList<>();
-        waypoints2 = new ArrayList<>();
-        waypoints3 = new ArrayList<>();
-
+        empty = new ArrayList<>();
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -199,13 +193,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         EClosestIndex = destinations.indexOf(closestPoint);
                         Log.d(TAG, "index ta destination" + EClosestIndex);
                         Log.d(TAG, "Closest point to Destination: " + closestPoint );
-                        requestPolyline( castStringToLatLng(closestPoint), destToClose);
-                        for (int j=SClosestIndex+1; j<EClosestIndex; j++) {
-//                            if (waypoints.size() < 23){
-//                                waypoints.add(destinations.get(j));}
-//                            else{
-//                               waypoints2.add(destinations.get(j));}
-//                        }
+                        requestPolyline( castStringToLatLng(closestPoint), destToClose ,empty);
+                        for (int j=SClosestIndex+1; j<EClosestIndex; j++){
                             waypoints.add(destinations.get(j));
                     }
 
@@ -253,6 +242,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 //                        Log.d(TAG, "waypoints arraylist: " +waypoints2);
 //                    }
+                        requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)) , locdest , waypoints);
+                        Log.d(TAG, "waypoints arraylist: " +waypoints);
+                    }
                 });
             }
 
@@ -353,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 if (listPoints.size() == 2) {
                     //Create the URL to get request from first marker to second marker
-                    String url = getRequestUrl(listPoints.get(0), listPoints.get(1));
+                    String url = getRequestUrl(listPoints.get(0), listPoints.get(1) , waypoints);
                     TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
                     taskRequestDirections.execute(url);
                 }
@@ -361,8 +353,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } );
     }
 
-    private String getRequestUrl(LatLng origin, LatLng dest) {
-        String waypointsString = TextUtils.join("|via:", waypoints);
+    private String getRequestUrl(LatLng origin, LatLng dest , List<String> wayppt) {
+        String waypointsString = TextUtils.join("|via:", wayppt);
         //Value of origin
         String str_org = "origin=" + origin.latitude +","+origin.longitude;
         //Value of destination
@@ -383,8 +375,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         String output = "json";
         //Create url to request
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + param;
-       // waypoints.clear();
-
+        waypoints.clear();
         return url;
     }
     private String requestDirection(String reqUrl) throws Exception {
@@ -549,9 +540,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             SClosestIndex =destinations.indexOf(closestPoint);
                             Log.d(TAG, " index Start "+ SClosestIndex);
                             Log.d(TAG, "Closest point to current location: " + closestPoint);
-                           requestPolyline( castStringToLatLng(closestPoint), locToClose);
-                            if (locdest1.size() > 0) {
-                                locdest1.clear();
+                           requestPolyline( castStringToLatLng(closestPoint), locToClose , empty);
+                            if (locdest.size() > 0) {
+                                locdest.clear();
                             }
                             locdest1.add(castStringToLatLng(destinations.get(SClosestIndex)));
                         }
@@ -599,7 +590,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return latLng;
     }
 
-    public void requestPolyline(LatLng latLng , ArrayList<LatLng> lol) {
+    public void requestPolyline(LatLng latLng , ArrayList<LatLng> lol, List<String> wayppt) {
         //Reset marker when already 2
         if (lol.size() == 2) {
             lol.clear();
@@ -622,7 +613,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (lol.size() == 2) {
             //Create the URL to get request from first marker to second marker
-            String url = getRequestUrl(lol.get(0), lol.get(1));
+            String url = getRequestUrl(lol.get(0), lol.get(1), wayppt);
             TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
             taskRequestDirections.execute(url);
         }
