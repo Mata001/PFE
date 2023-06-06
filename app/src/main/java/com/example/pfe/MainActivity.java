@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
@@ -202,6 +203,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         for (int j=SClosestIndex+1; j<EClosestIndex; j++){
                             waypoints.add(destinations.get(j));
                             Log.d(TAG, "waypoints arraylist: " +waypoints + "   driving");}
+                        new Handler().postDelayed(new Runnable(){
+                            @Override
+                            public void run() {
+                                requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)) , locdest , waypoints, "driving");
+                                                      }
+                        }, 500);
 
 
                     }
@@ -232,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             return;
         } else {
-            requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)) , locdest , waypoints, "driving");
             Toast.makeText(this, "Tap twice to exit", Toast.LENGTH_SHORT).show();
         }
         mPressed = System.currentTimeMillis();
