@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
@@ -28,6 +29,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
@@ -89,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ArrayList<LatLng> locdest;
     ArrayList<LatLng> locdest1;
     ArrayList<LatLng> locdest2;
+    boolean mod = false;
+    ArrayList <LatLng>locdest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -201,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         EClosestIndex = destinations.indexOf(closestPoint);
                         Log.d(TAG, "index ta destination" + EClosestIndex);
                         Log.d(TAG, "Closest point to Destination: " + closestPoint);
-                        requestPolyline(castStringToLatLng(closestPoint), destToClose, empty);
+                        requestPolyline(castStringToLatLng(closestPoint), destToClose, empty, "walking");
                         wpptNb = EClosestIndex - SClosestIndex - 1;
 
 
@@ -236,6 +240,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             locdest2.add(castStringToLatLng(destinations.get(SClosestIndex + 24)));
 
                             wayppt = waypoints1;
+                            new Handler().postDelayed(new Runnable(){
+                                @Override
+                                public void run() {
+                                    requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)) , locdest , waypoints, "driving");
+                                }
+                            }, 500);
                             requestPolyline(castStringToLatLng(destinations.get(SClosestIndex + 24)), locdest1, waypoints1);
                             wayppt = waypoints2;
                             requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest2, waypoints2);
@@ -282,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 for (i = start; i < end; i++) {
                     ModelTram modelTram = snapshot.child(Integer.toString(i)).getValue(ModelTram.class);
 //                }
-                    //    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+            //    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     //ModelTram modelTram = dataSnapshot.getValue(ModelTram.class);
                     destinations.add(modelTram.getCoordinates());
                     LatLng latLng = castToLatLng(modelTram);
@@ -292,7 +302,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 Log.d(TAG, "destination arraylist " + destinations);
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
@@ -356,13 +365,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Set waypoints those are the bus stations
         String way = "waypoints=" + waypointsString;
         //Mode for find direction
-        String mode = "mode=walking";
+        String mod =  "mode=walking";
         //String key for api key
         String key = "key=AIzaSyBXqq6EL6IwRunjoA9r7ctDwzikEaN1FEE";
         //Build the full param
-        String param = alt + "&" + str_org + "&" + mode + "&" + str_dest +
-                "&" + way +
-                "&" + key;
+        String param = alt +"&"+ str_org +"&" +mod +"&"+ str_dest +
+                "&"+ way+
+                "&" +key;
         //Output format
         String output = "json";
         //Create url to request
@@ -372,7 +381,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         return url;
     }
-
     private String requestDirection(String reqUrl) throws Exception {
         String responseString = "";
         InputStream inputStream = null;
@@ -408,7 +416,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         System.out.println(responseString);
         return responseString;
     }
-
     public class TaskRequestDirections extends AsyncTask<String, Void, String> {
 
         @Override
@@ -451,9 +458,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public void onPostExecute(List<List<HashMap<String, String>>> lists) {
             //Get list route and display it into the map
-
             ArrayList points = null;
-
             PolylineOptions polylineOptions = null;
 
             for (List<HashMap<String, String>> path : lists) {
@@ -474,8 +479,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 polylineOptions.jointType(1);
                 polylineOptions.geodesic(true);
                 List<PatternItem> pattern;
-                pattern = Arrays.asList(new Dot(), new Gap(30));
-                polylineOptions.pattern(pattern);
+                if (mod){
+                    pattern = Arrays.asList(new Dash(30));
+                }else {pattern = Arrays.asList(new Dot(),new Gap(30));
+                    polylineOptions.color(Color.BLUE);
+                    polylineOptions.width(15f);
+                    polylineOptions.pattern(pattern);}
+
+                Log.d(TAG, "onPostExecute: 1111111111111  " + mod);
 
             }
 
@@ -587,7 +598,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return latLng;
     }
 
-    public void requestPolyline(LatLng latLng, ArrayList<LatLng> lol, List<String> wayppt) {
+    public void requestPolyline(LatLng latLng , ArrayList<LatLng> lol, List<String> wayppt, String mode) {
+        mod = modeProvider(mode);
+        Log.d(TAG, "requestPolyline: mode is "  +mod +"       " + mode);
         //Reset marker when already 2
         if (lol.size() == 2) {
             lol.clear();
@@ -614,6 +627,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
             taskRequestDirections.execute(url);
         }
+    }
+
+    public boolean modeProvider(String modee){
+        if(modee == "walking")  return false;
+        else return true;
     }
 
 }
