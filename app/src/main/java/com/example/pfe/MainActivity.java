@@ -482,8 +482,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
 
                 polylineOptions.addAll(points);
-                polylineOptions.width(20f);
-                polylineOptions.color(Color.rgb(252, 3, 36));
+                polylineOptions.width(15f);
+                polylineOptions.color(Color.argb(150,252, 3, 36));
                 polylineOptions.startCap(new RoundCap());
                 polylineOptions.endCap(new RoundCap());
                 polylineOptions.jointType(1);
