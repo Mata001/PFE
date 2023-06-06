@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ArrayList<LatLng> locdest1;
     ArrayList<LatLng> locdest2;
     boolean mod = false;
-    ArrayList <LatLng>locdest;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         wpptNb = EClosestIndex - SClosestIndex - 1;
 
 
-                        if (wpptNb < 23) {
+                        if (wpptNb < 26) {
                             for (int j = SClosestIndex + 1; j < EClosestIndex; j++) {
                                 waypoints.add(destinations.get(j));
                             }
@@ -217,13 +217,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             if (locdest.size() > 0) {
                                 locdest.clear();
                             }
-                            locdest.add(castStringToLatLng(waypoints.get(0)));
-                            requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest, waypoints);
+                            locdest.add(castStringToLatLng(destinations.get(SClosestIndex)));
+                            new Handler().postDelayed(new Runnable(){
+                                @Override
+                                public void run() {
+                                    requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)) , locdest , waypoints, "driving");
+                                }
+                            }, 500);
+//                            requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest, waypoints);
                         } else {
-                            for (int m = SClosestIndex + 1; m < SClosestIndex + 24; m++) {
+                            for (int m = SClosestIndex + 1; m < SClosestIndex + 26; m++) {
                                 waypoints1.add(destinations.get(m));
                             }
-                            for (int n = SClosestIndex + 25; n < EClosestIndex - 1; n++) {
+                            for (int n = SClosestIndex + 27; n < EClosestIndex - 1; n++) {
                                 waypoints2.add(destinations.get(n));
                             }
 
@@ -237,18 +243,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             if (locdest2.size() > 0) {
                                 locdest2.clear();
                             }
-                            locdest2.add(castStringToLatLng(destinations.get(SClosestIndex + 24)));
+                            locdest2.add(castStringToLatLng(destinations.get(SClosestIndex + 26)));
 
-                            wayppt = waypoints1;
+//                            wayppt = waypoints1;
+//                            wayppt = waypoints2;
                             new Handler().postDelayed(new Runnable(){
                                 @Override
                                 public void run() {
-                                    requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)) , locdest , waypoints, "driving");
+
+//                                    wayppt = waypoints1;
+                                    requestPolyline(castStringToLatLng(destinations.get(SClosestIndex + 26)), locdest1, waypoints1, "driving");
+//                                    wayppt = waypoints2;
+                                    requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest2, waypoints2, "driving");
                                 }
                             }, 500);
-                            requestPolyline(castStringToLatLng(destinations.get(SClosestIndex + 24)), locdest1, waypoints1);
-                            wayppt = waypoints2;
-                            requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest2, waypoints2);
+//                            requestPolyline(castStringToLatLng(destinations.get(SClosestIndex + 24)), locdest1, waypoints1);
                         }
                     }
                 });
@@ -474,14 +483,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 polylineOptions.addAll(points);
                 polylineOptions.width(20f);
-                polylineOptions.color(Color.rgb(252, 3, 161));
+                polylineOptions.color(Color.rgb(252, 3, 36));
                 polylineOptions.startCap(new RoundCap());
+                polylineOptions.endCap(new RoundCap());
                 polylineOptions.jointType(1);
                 polylineOptions.geodesic(true);
                 List<PatternItem> pattern;
                 if (mod){
-                    pattern = Arrays.asList(new Dash(30));
-                }else {pattern = Arrays.asList(new Dot(),new Gap(30));
+                    pattern = Arrays.asList(new Dash(25));
+                }else {pattern = Arrays.asList(new Dot(),new Gap(25));
                     polylineOptions.color(Color.BLUE);
                     polylineOptions.width(15f);
                     polylineOptions.pattern(pattern);}
@@ -548,7 +558,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             SClosestIndex = destinations.indexOf(closestPoint);
                             Log.d(TAG, " index Start " + SClosestIndex);
                             Log.d(TAG, "Closest point to current location: " + closestPoint);
-                            requestPolyline(castStringToLatLng(closestPoint), locToClose, empty);
+                            requestPolyline(castStringToLatLng(closestPoint), locToClose, empty, "walking");
                         }
                     });
                 } else {
