@@ -120,4 +120,10 @@ public class DirectionsParser {
 
         return poly;
     }
+    public int returnDuration(){
+        return totalDuration;
+    }
+    public int returnDistance(){
+        return totalDistance;
+    }
 }

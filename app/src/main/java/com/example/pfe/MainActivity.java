@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 //        ----------
-        databaseReference = FirebaseDatabase.getInstance().getReference("features");
+        databaseReference = FirebaseDatabase.getInstance().getReference("Tramway");
 //        ----------------------------- Waypoints creation
     }
 
@@ -542,26 +542,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), 20));
 //------------------------------find closest point--------------------------------
 
-                    ClosestPointFinder.findClosestPoint(latlngToString(currentLatLng), destinations, new ClosestPointFinder.DistanceCallback() {
-                        @Override
-                        public void onDistanceReceived(int distance) {
-                            Log.d(TAG, "Shortest distance to current location " + distance);
-                            // Handle distance received
-                        }
-
-                        @Override
-                        public void onDistanceFailed() {
-                            // Handle distance request failure
-                        }
-
-                        @Override
-                        public void onClosestPointReceived(String closestPoint) {
-                            SClosestIndex = destinations.indexOf(closestPoint);
-                            Log.d(TAG, " index Start " + SClosestIndex);
-                            Log.d(TAG, "Closest point to current location: " + closestPoint);
-                            requestPolyline(castStringToLatLng(closestPoint), locToClose, empty, "walking");
-                        }
-                    });
+                    closestfinder(currentLatLng,destinations);
                 } else {
                     Toast.makeText(MainActivity.this, "Unable to get current location", Toast.LENGTH_SHORT).show();
                 }
@@ -644,5 +625,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(modee == "walking")  return false;
         else return true;
     }
+ public void closestfinder(LatLng latLng , ArrayList<String> dest) {
 
+        ClosestPointFinder.findClosestPoint(latlngToString(latLng), dest, new ClosestPointFinder.DistanceCallback() {
+            @Override
+            public void onDistanceReceived(int distance) {
+                Log.d(TAG, "Shortest distance to current location " + distance);
+                // Handle distance received
+            }
+
+            @Override
+            public void onDistanceFailed() {
+                // Handle distance request failure
+            }
+
+            @Override
+            public void onClosestPointReceived(String closestPoint) {
+                SClosestIndex = dest.indexOf(closestPoint);
+                Log.d(TAG, " index Start " + SClosestIndex);
+                Log.d(TAG, "Closest point to current location: " + closestPoint);
+                requestPolyline(castStringToLatLng(closestPoint), locToClose, empty, "walking");
+            }
+        });
+    }
 }
