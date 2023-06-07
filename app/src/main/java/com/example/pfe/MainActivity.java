@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //--------------------------------Location Permission--------------------------------
         // Check if location permission is granted
-        /*if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             // Enable current location button and show current location on the map
             enableCurrentLocation();
@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
-        }*/
+        }
 
         //--------------------------------On Map Long Click Listener--------------------------------
         /*googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
@@ -484,12 +484,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //--------------------------------Enable Current Location--------------------------------
     private void enableCurrentLocation() {
         // Check if the device has location services enabled
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED
-//                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
 
         // Enable the location layer on the map
         mMap.setMyLocationEnabled(true);
