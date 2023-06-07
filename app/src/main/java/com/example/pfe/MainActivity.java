@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 //        ----------
-        databaseReference = FirebaseDatabase.getInstance().getReference("features");
+        databaseReference = FirebaseDatabase.getInstance().getReference("H");
 //        ----------------------------- Waypoints creation
     }
 
@@ -290,13 +290,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //-------------------------------------------------
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        int start = 0;
-        int end = 31;
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 //                for (int i = 0;i<32;i++){
-//
+                int start = 0;
+                long end = snapshot.getChildrenCount();
+                Log.d(TAG, "length "+ end);
 //                    DataSnapshot dataSnapshot = snapshot.getChildren();
                 for (i = start; i < end; i++) {
                     ModelTram modelTram = snapshot.child(Integer.toString(i)).getValue(ModelTram.class);
