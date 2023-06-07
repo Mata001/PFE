@@ -1,5 +1,7 @@
 package com.example.pfe;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -11,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class DirectionsParser {
-
+    private static String TAG = "json:";
     /**
      * Returns a list of lists containing latitude and longitude from a JSONObject
      */
@@ -21,10 +23,23 @@ public class DirectionsParser {
         JSONArray jRoutes = null;
         JSONArray jLegs = null;
         JSONArray jSteps = null;
+        int totalDistance=0;
+        int totalDuration=0;
 
         try {
 
             jRoutes = jObject.getJSONArray("routes");
+
+
+                JSONObject route = jRoutes.getJSONObject(0);
+                JSONArray legs = route.getJSONArray("legs");
+//            for (int w = 0; i < legs.length(); w++) {
+//                JSONObject leg = legs.getJSONObject(w);
+//                JSONObject distance = leg.getJSONObject("distance");
+//                int distanceValue = distance.getInt("value");
+//                totalDistance = distanceValue+totalDistance;
+//                Log.d(TAG, "total distanceeeee "+ totalDistance);
+//            }
 
             // Loop for all routes
             for (int i = 0; i < jRoutes.length(); i++) {
@@ -34,6 +49,13 @@ public class DirectionsParser {
                 //Loop for all legs
                 for (int j = 0; j < jLegs.length(); j++) {
                     jSteps = ((JSONObject) jLegs.get(j)).getJSONArray("steps");
+                    JSONObject distance =((JSONObject) jLegs.get(j)).getJSONObject("distance");
+                    int distanceValue = distance.getInt("value");
+                    totalDistance = distanceValue+totalDistance;
+                    JSONObject duration =((JSONObject) jLegs.get(j)).getJSONObject("duration");
+                    int durationValue = duration.getInt("value");
+                    totalDuration = durationValue+totalDuration;
+
 
                     //Loop for all steps
                     for (int k = 0; k < jSteps.length(); k++) {
@@ -57,7 +79,7 @@ public class DirectionsParser {
             e.printStackTrace();
         } catch (Exception e) {
         }
-
+        Log.d(TAG, "total distance and total duration is  "+ totalDistance +"    "+ totalDuration);
         return routes;
     }
 
