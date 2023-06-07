@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class DirectionsParser {
+    int totalDistance=0;
+    int totalDuration=0;
     private static String TAG = "json:";
     /**
      * Returns a list of lists containing latitude and longitude from a JSONObject
@@ -23,8 +25,7 @@ public class DirectionsParser {
         JSONArray jRoutes = null;
         JSONArray jLegs = null;
         JSONArray jSteps = null;
-        int totalDistance=0;
-        int totalDuration=0;
+
 
         try {
 
