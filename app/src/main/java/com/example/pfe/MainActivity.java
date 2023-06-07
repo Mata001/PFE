@@ -111,33 +111,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         waypoints2 = new ArrayList<>();
         wayppt = new ArrayList<>();
 
-        FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-
-
-//--------------------Enable Location services---------------
-
+        databaseReference = FirebaseDatabase.getInstance().getReference("H");
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+
+//--------------------Enable Location services from Settings---------------
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
             startActivity(intent);
         }
-//---------------------------distance request--------------------------------------------
-        DistanceMatrixApiUtils.getDistance("35.66125490371664,-0.6320125940081027|35.665560367115546,-0.6346715501204017|35.67129104455131,-0.6381626487760172|35.67608877397281,-0.6411018327659121", "Caféteria CHERGUI,6,Oran", new DistanceMatrixApiUtils.DistanceCallback() {
-            @Override
-            public void onDistanceReceived(int distance) {
-                Log.d(TAG, "Distance: " + distance + " meters");
-            }
 
-            @Override
-            public void onDistanceFailed() {
-                Log.d(TAG, "Failed to retrieve distance.");
-            }
-        });
-
-//-----------------------------currentLocation-------------------------------------
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+//-----------------------------CurrentLocation -------------------------------------
         currentLocationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -145,44 +134,40 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mMap.clear();
             }
         });
-//        --------affichage--------------
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+//--------------------------------Display map---------------------------------------
         mapFragment.getMapAsync(this);
-//----------------------------------Go next Activity----------------------------
+
+//----------------------------55------------------------------
         // Initialize Places.
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), "AIzaSyCnMasBoIdVpjj97TGyBUA44oC09BMxjUs");
         }
-// Create a new Places client instance.
+        // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
 
         // Initialize the AutocompleteSupportFragment.
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+//----------------------------Autocomplete Restriction to Oran------------------------------
         autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(
                 new LatLng(35.604562, -0.748931),
                 new LatLng(35.788521, -0.501718)));
-
         // Specify the types of place data to return.
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
-
-
         // Set up a PlaceSelectionListener to handle the response.
+
+//----------------------------On Place searched listener------------------------------
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
-                //mMap.clear();
-                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
-                Toast.makeText(MainActivity.this, "ok " + place.getLatLng(), Toast.LENGTH_SHORT).show();
-                //MarkerOptions markerOptions = new MarkerOptions();
-                //markerOptions.position(place.getLatLng());
-                //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-                //mMap.addMarker(markerOptions);
+                Toast.makeText(MainActivity.this, /*place.getLatLng()+*/  place.getName() +" is your destination", Toast.LENGTH_SHORT).show();
+//              marker
                 if (destToClose.size() > 0) {
                     destToClose.clear();
                 }
                 destToClose.add(place.getLatLng());
-                moveCameraToLocation(place.getLatLng(), 15);
+//                LatLng center = new LatLng((lat+lat)/2)
+//                moveCameraToLocation(center, 15);
 
                 //------------------------------find closest point--------------------------------
 
@@ -269,40 +254,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.i(TAG, "An error occurred: " + status);
             }
         });
-//        ----------
-        databaseReference = FirebaseDatabase.getInstance().getReference("H");
-//        ----------------------------- Waypoints creation
     }
 
-    //-------------------Tap twice to exit------------------------
-    @Override
-    public void onBackPressed() {
-        if (mPressed + TIME_INTERVAL > System.currentTimeMillis()) {
-            super.onBackPressed();
-            return;
-        } else {
-            Toast.makeText(this, "Tap twice to exit", Toast.LENGTH_SHORT).show();
-        }
-        mPressed = System.currentTimeMillis();
-    }
-
-    //--------------------------------------------------
-//-------------------------------------------------
-    @Override
+    //----------------------------On Place searched listener------------------------------
+        @Override
     public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle));
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+        //--------------------------------Database Retrieve Data--------------------------------
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                for (int i = 0;i<32;i++){
                 int start = 0;
                 long end = snapshot.getChildrenCount();
                 Log.d(TAG, "length "+ end);
-//                    DataSnapshot dataSnapshot = snapshot.getChildren();
                 for (i = start; i < end; i++) {
-                    ModelTram modelTram = snapshot.child(Integer.toString(i)).getValue(ModelTram.class);
-//                }
-            //    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    //DataSnapshot dataSnapshot = snapshot.getChildren();
+                    //for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     //ModelTram modelTram = dataSnapshot.getValue(ModelTram.class);
+                    ModelTram modelTram = snapshot.child(Integer.toString(i)).getValue(ModelTram.class);
                     destinations.add(modelTram.getCoordinates());
                     LatLng latLng = castToLatLng(modelTram);
                     MarkerOptions markerOptions = new MarkerOptions();
@@ -315,22 +288,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
-        mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle));
+
+        //--------------------------------Location Permission--------------------------------
         // Check if location permission is granted
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        /*if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             // Enable current location button and show current location on the map
             enableCurrentLocation();
-            mMap.getUiSettings().setMyLocationButtonEnabled(false);
         } else {
             // Request location permission
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
-        }
-        googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+        }*/
+
+        //--------------------------------On Map Long Click Listener--------------------------------
+        /*googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
 
             @Override
             public void onMapLongClick(LatLng latLng) {
@@ -361,9 +334,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     taskRequestDirections.execute(url);
                 }
             }
-        });
+        });*/
     }
 
+    //--------------------------------Create Direction URL--------------------------------
     private String getRequestUrl(LatLng origin, LatLng dest, List<String> wayppt) {
         String waypointsString = TextUtils.join("|via:", wayppt);
         //Value of origin
@@ -379,18 +353,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //String key for api key
         String key = "key=AIzaSyBXqq6EL6IwRunjoA9r7ctDwzikEaN1FEE";
         //Build the full param
-        String param = alt +"&"+ str_org +"&" +mod +"&"+ str_dest +
-                "&"+ way+
-                "&" +key;
-        //Output format
-        String output = "json";
+        String param = alt +"&"+ str_org +"&" +mod +"&"+ str_dest +"&"+ way+"&" +key;
         //Create url to request
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + param;
+        String url = "https://maps.googleapis.com/maps/api/directions/json?" + param;
         Log.d(TAG, "waypoints requested " + url);
         wayppt.clear();
-
         return url;
     }
+
+    //--------------------------------Request Direction URL--------------------------------
     private String requestDirection(String reqUrl) throws Exception {
         String responseString = "";
         InputStream inputStream = null;
@@ -426,6 +397,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         System.out.println(responseString);
         return responseString;
     }
+
+    //--------------------------------55--------------------------------
     public class TaskRequestDirections extends AsyncTask<String, Void, String> {
 
         @Override
@@ -449,6 +422,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //-------------------------------55---------------------------------
     public class TaskParser extends AsyncTask<String, Void, List<List<HashMap<String, String>>>> {
 
         @Override
@@ -478,7 +452,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 for (HashMap<String, String> point : path) {
                     double lat = Double.parseDouble(point.get("lat"));
                     double lon = Double.parseDouble(point.get("lon"));
-
                     points.add(new LatLng(lat, lon));
                 }
 
@@ -492,15 +465,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 List<PatternItem> pattern;
                 if (mod){
                     pattern = Arrays.asList(new Dash(30));
-                }else {pattern = Arrays.asList(new Dot(),new Gap(30));
+                }else {
+                    pattern = Arrays.asList(new Dot(),new Gap(30));
                     polylineOptions.color(Color.argb(150, 252, 3, 161));
                     polylineOptions.width(15f);
-                    polylineOptions.pattern(pattern);}
-
-                Log.d(TAG, "onPostExecute: 1111111111111  " + mod);
-
+                    polylineOptions.pattern(pattern);
+                }
             }
-
             if (polylineOptions != null) {
                 mMap.addPolyline(polylineOptions);
             } else {
@@ -510,15 +481,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //--------------------------------Enable Current Location--------------------------------
     private void enableCurrentLocation() {
         // Check if the device has location services enabled
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        //database marker
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+//                != PackageManager.PERMISSION_GRANTED
+//                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            return;
+//        }
 
         // Enable the location layer on the map
         mMap.setMyLocationEnabled(true);
@@ -535,11 +506,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         locToClose.clear();
                     }
                     locToClose.add(currentLatLng);
-
-
-//                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(oran, 10));
                     Log.d(TAG, "location is : " + currentLatLng);
-//                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), 20));
+
 //------------------------------find closest point--------------------------------
 
                     ClosestPointFinder.findClosestPoint(latlngToString(currentLatLng), destinations, new ClosestPointFinder.DistanceCallback() {
@@ -569,6 +537,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    //--------------------------------Location Permission--------------------------------
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -583,32 +552,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void moveCameraToLocation(LatLng location, float zoom) {
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
-        mMap.addMarker(new MarkerOptions().position(location));
-    }
-
-    public String latlngToString(LatLng lg) {
-        String stringlatlong = Double.toString(lg.latitude) + "," + Double.toString(lg.longitude);
-        return stringlatlong;
-    }
-
-    public LatLng castToLatLng(ModelTram modelTram) {
-        String[] latlong = modelTram.getCoordinates().split(",");
-        double longitude = Double.parseDouble(latlong[1]);
-        double latitude = Double.parseDouble(latlong[0]);
-        LatLng latLng = new LatLng(latitude, longitude);
-        return latLng;
-    }
-
-    public LatLng castStringToLatLng(String string) {
-        String[] latlong = string.split(",");
-        double longitude = Double.parseDouble(latlong[1]);
-        double latitude = Double.parseDouble(latlong[0]);
-        LatLng latLng = new LatLng(latitude, longitude);
-        return latLng;
-    }
-
+    //--------------------------------Request a Polyline--------------------------------
     public void requestPolyline(LatLng latLng , ArrayList<LatLng> lol, List<String> wayppt, String mode) {
         mod = modeProvider(mode);
         Log.d(TAG, "requestPolyline: mode is "  +mod +"       " + mode);
@@ -639,10 +583,53 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             taskRequestDirections.execute(url);
         }
     }
-
-    public boolean modeProvider(String modee){
-        if(modee == "walking")  return false;
+    //--------------------------------Walking/Driving polyline--------------------------------
+    public boolean modeProvider(String mod){
+        if(mod == "walking")
+            return false;
         else return true;
     }
 
+
+    //--------------------------------Move Camera/ Add Marker-------------------------------
+    private void moveCameraToLocation(LatLng location, float zoom) {
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
+        mMap.addMarker(new MarkerOptions().position(location));
+    }
+
+    //--------------------------------Latlng to String--------------------------------
+    public String latlngToString(LatLng lg) {
+        String stringlatlong = Double.toString(lg.latitude) + "," + Double.toString(lg.longitude);
+        return stringlatlong;
+    }
+
+    //--------------------------------ModelTram to Latlng--------------------------------
+    public LatLng castToLatLng(ModelTram modelTram) {
+        String[] latlong = modelTram.getCoordinates().split(",");
+        double longitude = Double.parseDouble(latlong[1]);
+        double latitude = Double.parseDouble(latlong[0]);
+        LatLng latLng = new LatLng(latitude, longitude);
+        return latLng;
+    }
+
+    //--------------------------------String to Latlng--------------------------------
+    public LatLng castStringToLatLng(String string) {
+        String[] latlong = string.split(",");
+        double longitude = Double.parseDouble(latlong[1]);
+        double latitude = Double.parseDouble(latlong[0]);
+        LatLng latLng = new LatLng(latitude, longitude);
+        return latLng;
+    }
+
+    //--------------------------------Tap twice to exit--------------------------------
+    @Override
+    public void onBackPressed() {
+        if (mPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+            super.onBackPressed();
+            return;
+        } else {
+            Toast.makeText(this, "Tap twice to exit", Toast.LENGTH_SHORT).show();
+        }
+        mPressed = System.currentTimeMillis();
+    }
 }
