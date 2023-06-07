@@ -15,7 +15,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-
+import com.google.android.gms.maps.model.MapStyleOptions;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -317,6 +317,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle));
         // Check if location permission is granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -490,9 +491,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 polylineOptions.geodesic(true);
                 List<PatternItem> pattern;
                 if (mod){
-                    pattern = Arrays.asList(new Dash(25));
-                }else {pattern = Arrays.asList(new Dot(),new Gap(25));
-                    polylineOptions.color(Color.BLUE);
+                    pattern = Arrays.asList(new Dash(30));
+                }else {pattern = Arrays.asList(new Dot(),new Gap(30));
+                    polylineOptions.color(Color.argb(150, 252, 3, 161));
                     polylineOptions.width(15f);
                     polylineOptions.pattern(pattern);}
 
