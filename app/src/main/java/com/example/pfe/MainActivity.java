@@ -68,7 +68,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static String TAG = "info:";
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationManager locationManager;
     public static final int TIME_INTERVAL = 2000;
@@ -79,8 +79,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     int i;
     int wpptNb;
     ArrayList<String> destinations;
-    int SClosestIndex;
-    int EClosestIndex;
+    static int SClosestIndex;
+    static int EClosestIndex;
     List<String> waypoints;
     List<String> waypoints1;
     List<String> waypoints2;
@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 //------------------------------find closest point--------------------------------
 
-                ClosestPointFinder.findClosestPoint(latlngToString(place.getLatLng()), destinations, new ClosestPointFinder.DistanceCallback() {
+                /*ClosestPointFinder.findClosestPoint(latlngToString(place.getLatLng()), destinations, new ClosestPointFinder.DistanceCallback() {
                     String TAG = " ";
 
                     @Override
@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                            requestPolyline(castStringToLatLng(destinations.get(SClosestIndex + 24)), locdest1, waypoints1);
                         }
                     }
-                });
+                });*/
             }
 
             @Override
@@ -261,11 +261,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle));
+//        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.class, R.raw.mapstyle));
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        BestOnePath bestOnePath = new BestOnePath();
+        bestOnePath.retrieveData();
 
         //--------------------------------Database Retrieve Data--------------------------------
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        /*databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 int start = 0;
@@ -287,8 +289,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
-        });
-
+        });*/
         //--------------------------------Location Permission--------------------------------
         // Check if location permission is granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -510,7 +511,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 //------------------------------find closest point--------------------------------
 
-                    ClosestPointFinder.findClosestPoint(latlngToString(currentLatLng), destinations, new ClosestPointFinder.DistanceCallback() {
+                    /*ClosestPointFinder.findClosestPoint(latlngToString(currentLatLng), destinations, new ClosestPointFinder.DistanceCallback() {
                         @Override
                         public void onDistanceReceived(int distance) {
                             Log.d(TAG, "Shortest distance to current location " + distance);
@@ -529,7 +530,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Log.d(TAG, "Closest point to current location: " + closestPoint);
                             requestPolyline(castStringToLatLng(closestPoint), locToClose, empty, "walking");
                         }
-                    });
+                    });*/
                 } else {
                     Toast.makeText(MainActivity.this, "Unable to get current location", Toast.LENGTH_SHORT).show();
                 }
@@ -604,7 +605,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //--------------------------------ModelTram to Latlng--------------------------------
-    public LatLng castToLatLng(ModelTram modelTram) {
+    public static LatLng castToLatLng(ModelTram modelTram) {
         String[] latlong = modelTram.getCoordinates().split(",");
         double longitude = Double.parseDouble(latlong[1]);
         double latitude = Double.parseDouble(latlong[0]);
