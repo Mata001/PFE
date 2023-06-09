@@ -111,8 +111,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         waypoints2 = new ArrayList<>();
         wayppt = new ArrayList<>();
 
-        firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference("H");
+        BestOnePath bestOnePath = new BestOnePath();
+         bestOnePath.readData(new BestOnePath.FirebaseCallback() {
+             @Override
+             public void onCallback(ArrayList<Object> list) {
+                 Log.d(TAG, "onCallback: main a baba "+list);
+             }
+         });
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
@@ -263,9 +268,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 //        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.class, R.raw.mapstyle));
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
-        BestOnePath bestOnePath = new BestOnePath();
-        bestOnePath.retrieveData();
-
         //--------------------------------Database Retrieve Data--------------------------------
         /*databaseReference.addValueEventListener(new ValueEventListener() {
             @Override

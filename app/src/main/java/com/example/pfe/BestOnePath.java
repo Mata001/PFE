@@ -22,37 +22,17 @@ public class BestOnePath implements OnMapReadyCallback {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static String TAG = "info:";
     private GoogleMap mMap;
-    private FusedLocationProviderClient fusedLocationClient;
-    private LocationManager locationManager;
-    public static final int TIME_INTERVAL = 2000;
-    private long mPressed;
-    FirebaseDatabase firebaseDatabase;
-    DatabaseReference databaseReference;
-    ArrayList<LatLng> listPoints;
     int i;
     int wpptNb;
-    ArrayList<String> destinations;
     int SClosestIndex;
     int EClosestIndex;
     List<String> waypoints;
     List<String> waypoints1;
     List<String> waypoints2;
     List<String> wayppt;
-    ArrayList<LatLng> locToClose;
-    ArrayList<LatLng> destToClose;
     List<String> empty;
-    ArrayList<LatLng> locdest;
-    ArrayList<LatLng> locdest1;
-    ArrayList<LatLng> locdest2;
     boolean mod = false;
-//    listPoints = new ArrayList<>();
-//    locdest = new ArrayList<>();
-//    locdest1 = new ArrayList<>();
-//    locdest2 = new ArrayList<>();
 //    empty = new ArrayList<>();
-
-//    locToClose = new ArrayList<>();
-//    destToClose = new ArrayList<>();
 //    waypoints = new ArrayList<>();
 //    waypoints1 = new ArrayList<>();
 //    waypoints2 = new ArrayList<>();
@@ -62,21 +42,11 @@ public class BestOnePath implements OnMapReadyCallback {
     public void onMapReady(@NonNull GoogleMap googleMap) {
 
     }
-
-    public void retrieveData() {
-
+    public void readData(FirebaseCallback firebaseCallback){
+        ArrayList<Object> info = new ArrayList<>();
         ArrayList<String> destinations = new ArrayList<>();
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("H");
-//    FirebaseDatabase fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-//    LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//    FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
-//    SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-//    AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        int shortDistance = Integer.MAX_VALUE;
-        int shortDuration = Integer.MAX_VALUE;
-
-
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -113,6 +83,8 @@ public class BestOnePath implements OnMapReadyCallback {
                         EClosestIndex = destinations.indexOf(closestPoint);
                         Log.d(TAG, "index ta Destination " + EClosestIndex);
                         Log.d(TAG, "Closest point to Destination: " + closestPoint);
+                        info.add(EClosestIndex);
+                        info.add(closestPoint);
 //                        requestPolyline(castStringToLatLng(closestPoint), destToClose, empty, "walking");
                     }
                 });
@@ -135,9 +107,12 @@ public class BestOnePath implements OnMapReadyCallback {
                         SClosestIndex = destinations.indexOf(closestPoint);
                         Log.d(TAG, "index ta Origin " + SClosestIndex);
                         Log.d(TAG, "Closest point to Origin: " + closestPoint);
-
+                        info.add(SClosestIndex);
+                        info.add(closestPoint);
+                        firebaseCallback.onCallback(info);
                     }
                 });
+
 
             }
 
@@ -146,6 +121,9 @@ public class BestOnePath implements OnMapReadyCallback {
 
             }
         });
+    }
+    public interface FirebaseCallback {
+        void onCallback(ArrayList<Object> list);
     }
 }
  /*if (wpptNb < 26) {
