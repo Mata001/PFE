@@ -1,11 +1,9 @@
 package com.example.pfe;
 
-import android.location.LocationManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
@@ -13,6 +11,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -42,78 +41,81 @@ public class BestOnePath implements OnMapReadyCallback {
     public void onMapReady(@NonNull GoogleMap googleMap) {
 
     }
-    public void readData(FirebaseCallback firebaseCallback){
+
+    public void readData(FirebaseCallback firebaseCallback) {
         ArrayList<Object> info = new ArrayList<>();
         ArrayList<String> destinations = new ArrayList<>();
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("H");
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                int start = 0;
-                long end = snapshot.getChildrenCount();
-//                 for (DataSnapshot dataSnapshot: snapshot.getChildren()){
-                for (i = start; i < end; i++) {
-                    ModelTram modelTram = snapshot.child(Integer.toString(i)).getValue(ModelTram.class);
-                    destinations.add(modelTram.getCoordinates());
-//                    LatLng test = new LatLng(35.704571, -0.588370);
-                    LatLng latLng = MainActivity.castToLatLng(modelTram);
-                    Log.d(TAG, "index " + i + " coordinate " + latLng);
+                    int start = 0;
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    String meanName = dataSnapshot.getKey();
+                    long end = snapshot.child(meanName).getChildrenCount();
+
+                    for (i = start; i < 27; i++) {
+                        ModelTram modelTram = snapshot.child(meanName).child(Integer.toString(i)).getValue(ModelTram.class);
+                        destinations.add(modelTram.getCoordinates());
+//                        LatLng test = new LatLng(35.704571, -0.588370);
+//                        LatLng latLng = MainActivity.castToLatLng(modelTram);
 //                    MarkerOptions markerOptions = new MarkerOptions();
 //                    markerOptions.position(test);
 //                            .title(modelTram.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.piner));
 //                    mMap.addMarker(markerOptions);
-                }
-
-                Log.d(TAG, "whole table " + destinations);
-
-                ClosestPointFinder.findClosestPoint("35.726535,-0.588799", destinations, new ClosestPointFinder.DistanceCallback() {
-                    @Override
-                    public void onDistanceReceived(int distance) {
-                        Log.d(TAG, "distances dest " + distance);
                     }
+                        Log.d(TAG, "Mean :"+meanName+", Number :"+end+", Stations :"+destinations);
 
-                    @Override
-                    public void onDistanceFailed() {
+                   /* Log.d(TAG, "whole table " + destinations);
 
-                    }
+                    ClosestPointFinder.findClosestPoint("35.726535,-0.588799", destinations, new ClosestPointFinder.DistanceCallback() {
+                        @Override
+                        public void onDistanceReceived(int distance) {
+                            Log.d(TAG, "distances dest " + distance);
+                        }
 
-                    @Override
-                    public void onClosestPointReceived(String closestPoint) {
-                        EClosestIndex = destinations.indexOf(closestPoint);
-                        Log.d(TAG, "index ta Destination " + EClosestIndex);
-                        Log.d(TAG, "Closest point to Destination: " + closestPoint);
-                        info.add(EClosestIndex);
-                        info.add(closestPoint);
+                        @Override
+                        public void onDistanceFailed() {
+
+                        }
+
+                        @Override
+                        public void onClosestPointReceived(String closestPoint) {
+                            EClosestIndex = destinations.indexOf(closestPoint);
+                            Log.d(TAG, "index ta Destination " + EClosestIndex);
+                            Log.d(TAG, "Closest point to Destination: " + closestPoint);
+                            info.add(EClosestIndex);
+                            info.add(closestPoint);
 //                        requestPolyline(castStringToLatLng(closestPoint), destToClose, empty, "walking");
-                    }
-                });
+                        }
+                    });
 
-                ClosestPointFinder.findClosestPoint("35.665752,-0.629140", destinations ,new ClosestPointFinder.DistanceCallback() {
-                    @Override
-                    public void onDistanceReceived(int distance) {
-                        Log.d(TAG, "distances origin " + distance);
+                    ClosestPointFinder.findClosestPoint("35.665752,-0.629140", destinations, new ClosestPointFinder.DistanceCallback() {
+                        @Override
+                        public void onDistanceReceived(int distance) {
+                            Log.d(TAG, "distances origin " + distance);
 
-                    }
+                        }
 
-                    @Override
-                    public void onDistanceFailed() {
-                        Log.d(TAG, "onDistanceFailed: Sorry");
+                        @Override
+                        public void onDistanceFailed() {
+                            Log.d(TAG, "onDistanceFailed: Sorry");
 
-                    }
+                        }
 
-                    @Override
-                    public void onClosestPointReceived(String closestPoint) {
-                        SClosestIndex = destinations.indexOf(closestPoint);
-                        Log.d(TAG, "index ta Origin " + SClosestIndex);
-                        Log.d(TAG, "Closest point to Origin: " + closestPoint);
-                        info.add(SClosestIndex);
-                        info.add(closestPoint);
-                        firebaseCallback.onCallback(info);
-                    }
-                });
-
-
+                        @Override
+                        public void onClosestPointReceived(String closestPoint) {
+                            SClosestIndex = destinations.indexOf(closestPoint);
+                            Log.d(TAG, "index ta Origin " + SClosestIndex);
+                            Log.d(TAG, "Closest point to Origin: " + closestPoint);
+                            info.add(SClosestIndex);
+                            info.add(closestPoint);
+                            firebaseCallback.onCallback(info);
+                            Log.d(TAG, "onClosestPointReceived: "+snapshot.getKey()+"   "+info);
+                        }
+                    });*/
+                }
             }
 
             @Override
@@ -122,6 +124,7 @@ public class BestOnePath implements OnMapReadyCallback {
             }
         });
     }
+
     public interface FirebaseCallback {
         void onCallback(ArrayList<Object> list);
     }
