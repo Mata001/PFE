@@ -15,6 +15,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,6 +39,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
+import com.google.android.gms.maps.model.StrokeStyle;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -75,7 +78,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private long mPressed;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
+    DatabaseReference databaseH;
     ArrayList<LatLng> listPoints;
+    ArrayList<JSONObject> objectfortram = new ArrayList<>();
     int i;
     int wpptNb;
     ArrayList<String> destinations;
@@ -92,6 +97,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ArrayList<LatLng> locdest1;
     ArrayList<LatLng> locdest2;
     boolean mod = false;
+    public int TOTALDURATION=0;
+    public int TOTALDISTANCE=0;
+    int totaltram = 0;
 
 
     @Override
@@ -111,9 +119,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         waypoints2 = new ArrayList<>();
         wayppt = new ArrayList<>();
 
+
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
 
 
 //--------------------Enable Location services---------------
@@ -142,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View view) {
                 enableCurrentLocation();
-                mMap.clear();
+                //mMap.clear();
             }
         });
 //        --------affichage--------------
@@ -224,6 +232,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)) , locdest , waypoints, "driving");
                                 }
                             }, 500);
+                            new Handler().postDelayed(new Runnable(){
+                                @Override
+                                public void run() {
+                                    acumilatorDurationDistance();
+                                }
+                            }, 1000);
 //                            requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest, waypoints);
                         } else {
                             for (int m = SClosestIndex + 1; m < SClosestIndex + 26; m++) {
@@ -255,10 +269,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     requestPolyline(castStringToLatLng(destinations.get(SClosestIndex + 26)), locdest1, waypoints1, "driving");
 //                                    wayppt = waypoints2;
                                     requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest2, waypoints2, "driving");
+                                    acumilatorDurationDistance();
                                 }
                             }, 500);
+                            new Handler().postDelayed(new Runnable(){
+                                @Override
+                                public void run() {
+                                    acumilatorDurationDistance();
+                                }
+                            }, 1000);
 //                            requestPolyline(castStringToLatLng(destinations.get(SClosestIndex + 24)), locdest1, waypoints1);
                         }
+
                     }
                 });
             }
@@ -271,6 +293,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 //        ----------
         databaseReference = FirebaseDatabase.getInstance().getReference("Tramway");
+
 //        ----------------------------- Waypoints creation
     }
 
@@ -317,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle));
+        //mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle));
         // Check if location permission is granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -457,24 +480,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             List<List<HashMap<String, String>>> routes = null;
             try {
                 jsonObject = new JSONObject(strings[0]);
+                objectfortram.add(jsonObject);
                 DirectionsParser directionsParser = new DirectionsParser();
                 routes = directionsParser.parse(jsonObject);
+                Log.d(TAG, "doInBackground: "+directionsParser.getdisdur(jsonObject));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             return routes;
         }
 
+
         @Override
         public void onPostExecute(List<List<HashMap<String, String>>> lists) {
             //Get list route and display it into the map
             ArrayList points = null;
             PolylineOptions polylineOptions = null;
+            PolylineOptions pp = null;
 
             for (List<HashMap<String, String>> path : lists) {
                 points = new ArrayList();
                 polylineOptions = new PolylineOptions();
-
+                pp = new PolylineOptions();
                 for (HashMap<String, String> point : path) {
                     double lat = Double.parseDouble(point.get("lat"));
                     double lon = Double.parseDouble(point.get("lon"));
@@ -483,18 +510,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
 
                 polylineOptions.addAll(points);
-                polylineOptions.width(15f);
-                polylineOptions.color(Color.argb(150,252, 3, 36));
+                polylineOptions.width(25f);
+                polylineOptions.color(Color.argb(200,110, 0, 15));
                 polylineOptions.startCap(new RoundCap());
                 polylineOptions.endCap(new RoundCap());
-                polylineOptions.jointType(1);
+                polylineOptions.jointType(2);
                 polylineOptions.geodesic(true);
                 List<PatternItem> pattern;
                 if (mod){
+                    pp.addAll(points);
+                    pp.width(10f);
+                    pp.color(Color.argb(250,252, 3, 36));
+                    pp.startCap(new RoundCap());
+                    pp.endCap(new RoundCap());
+                    pp.jointType(2);
+                    pp.geodesic(true);
                     pattern = Arrays.asList(new Dash(30));
-                }else {pattern = Arrays.asList(new Dot(),new Gap(30));
-                    polylineOptions.color(Color.argb(150, 252, 3, 161));
-                    polylineOptions.width(15f);
+                }else {pattern = Arrays.asList(new Dot(),new Gap(15));
+                    polylineOptions.color(Color.argb(200,140, 222, 140));
+                    polylineOptions.width(20f);
                     polylineOptions.pattern(pattern);}
 
                 Log.d(TAG, "onPostExecute: 1111111111111  " + mod);
@@ -503,6 +537,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             if (polylineOptions != null) {
                 mMap.addPolyline(polylineOptions);
+                mMap.addPolyline(pp);
             } else {
                 Toast.makeText(getApplicationContext(), "Direction not found!", Toast.LENGTH_SHORT).show();
             }
@@ -601,17 +636,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Save first point select
         lol.add(latLng);
         //Create marker
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-
+        //MarkerOptions markerOptions = new MarkerOptions();
+        //markerOptions.position(latLng);
+        CircleOptions circleOptions = new CircleOptions();
+        circleOptions.radius(25f);
+        circleOptions.strokeWidth(5);
+        circleOptions.fillColor(Color.GREEN);
         if (lol.size() == 1) {
             //Add first marker to the map
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            circleOptions.center(lol.get(0));
         } else {
             //Add second marker to the map
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            circleOptions.center(lol.get(1));
         }
-        mMap.addMarker(markerOptions);
+        mMap.addCircle(circleOptions);
 
         if (lol.size() == 2) {
             //Create the URL to get request from first marker to second marker
@@ -625,7 +663,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(modee == "walking")  return false;
         else return true;
     }
- public void closestfinder(LatLng latLng , ArrayList<String> dest) {
+ public void closestfinder(LatLng latLng , ArrayList<String> dest){
 
         ClosestPointFinder.findClosestPoint(latlngToString(latLng), dest, new ClosestPointFinder.DistanceCallback() {
             @Override
@@ -645,7 +683,31 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.d(TAG, " index Start " + SClosestIndex);
                 Log.d(TAG, "Closest point to current location: " + closestPoint);
                 requestPolyline(castStringToLatLng(closestPoint), locToClose, empty, "walking");
+
             }
         });
+    }
+    public int acumilatorDurationDistance(){
+        int total=0;
+        DirectionsParser directionsParser = new DirectionsParser();
+       // Log.d(TAG, "doInBackground:::::::::::::::::::::::::::::: "+directionsParser.getdisdur(objectfortram.get(0))+"   "+directionsParser.getdisdur(objectfortram.get(1))+"    "+directionsParser.getdisdur(objectfortram.get(2)));
+        try {
+            if (objectfortram.size()==4){
+            total = directionsParser.getdisdur(objectfortram.get(0)).get(1)+directionsParser.getdisdur(objectfortram.get(1)).get(1)+(directionsParser.getdisdur(objectfortram.get(2)).get(1)+directionsParser.getdisdur(objectfortram.get(3)).get(1))/3;
+            Log.d(TAG, "acumilatorDurationDistance: "+ total);
+            objectfortram.clear();}
+            else if (objectfortram.size()==3){
+                total = directionsParser.getdisdur(objectfortram.get(0)).get(1)+directionsParser.getdisdur(objectfortram.get(1)).get(1)+directionsParser.getdisdur(objectfortram.get(2)).get(1)/3;
+                Log.d(TAG, "acumilatorDurationDistance: "+ total);
+                objectfortram.clear();
+            }
+        }catch (Exception e){
+            Toast.makeText(this, "click on the location button first", Toast.LENGTH_SHORT).show();
+        }
+        return total;
+    }
+    public boolean bestRoute(int totaltram , int totalH){
+        if (totaltram>totalH)return false;
+        else return true;
     }
 }

@@ -9,18 +9,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.ArrayList.*;
 import java.util.HashMap;
 import java.util.List;
 
 public class DirectionsParser {
-    int totalDistance=0;
-    int totalDuration=0;
+
+
     private static String TAG = "json:";
     /**
      * Returns a list of lists containing latitude and longitude from a JSONObject
      */
     public List<List<HashMap<String, String>>> parse(JSONObject jObject) {
-
         List<List<HashMap<String, String>>> routes = new ArrayList<List<HashMap<String, String>>>();
         JSONArray jRoutes = null;
         JSONArray jLegs = null;
@@ -34,13 +34,7 @@ public class DirectionsParser {
 
                 JSONObject route = jRoutes.getJSONObject(0);
                 JSONArray legs = route.getJSONArray("legs");
-//            for (int w = 0; i < legs.length(); w++) {
-//                JSONObject leg = legs.getJSONObject(w);
-//                JSONObject distance = leg.getJSONObject("distance");
-//                int distanceValue = distance.getInt("value");
-//                totalDistance = distanceValue+totalDistance;
-//                Log.d(TAG, "total distanceeeee "+ totalDistance);
-//            }
+
 
             // Loop for all routes
             for (int i = 0; i < jRoutes.length(); i++) {
@@ -50,12 +44,8 @@ public class DirectionsParser {
                 //Loop for all legs
                 for (int j = 0; j < jLegs.length(); j++) {
                     jSteps = ((JSONObject) jLegs.get(j)).getJSONArray("steps");
-                    JSONObject distance =((JSONObject) jLegs.get(j)).getJSONObject("distance");
-                    int distanceValue = distance.getInt("value");
-                    totalDistance = distanceValue+totalDistance;
-                    JSONObject duration =((JSONObject) jLegs.get(j)).getJSONObject("duration");
-                    int durationValue = duration.getInt("value");
-                    totalDuration = durationValue+totalDuration;
+                    JSONObject distance = ((JSONObject) jLegs.get(j)).getJSONObject("distance");
+                    JSONObject duration = ((JSONObject) jLegs.get(j)).getJSONObject("duration");
 
 
                     //Loop for all steps
@@ -75,14 +65,14 @@ public class DirectionsParser {
                     routes.add(path);
                 }
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (Exception e) {
         }
-        Log.d(TAG, "total distance and total duration is  "+ totalDistance +"    "+ totalDuration);
         return routes;
     }
+
+
 
     /**
      * Method to decode polyline
@@ -121,10 +111,49 @@ public class DirectionsParser {
 
         return poly;
     }
-    public int returnDuration(){
-        return totalDuration;
-    }
-    public int returnDistance(){
-        return totalDistance;
+    public ArrayList<Integer> getdisdur(JSONObject jObject){
+        int totalDistance=0;
+        int totalDuration=0;
+        ArrayList<Integer> disdur = new ArrayList<>();
+        JSONArray jRoutes = null;
+        JSONArray jLegs = null;
+        JSONArray jSteps = null;
+
+
+        try {
+
+            jRoutes = jObject.getJSONArray("routes");
+
+
+            JSONObject route = jRoutes.getJSONObject(0);
+            JSONArray legs = route.getJSONArray("legs");
+
+
+            // Loop for all routes
+            for (int i = 0; i < jRoutes.length(); i++) {
+                jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
+                List path = new ArrayList<HashMap<String, String>>();
+
+                //Loop for all legs
+                for (int j = 0; j < jLegs.length(); j++) {
+                    jSteps = ((JSONObject) jLegs.get(j)).getJSONArray("steps");
+                    JSONObject distance =((JSONObject) jLegs.get(j)).getJSONObject("distance");
+                    int distanceValue = distance.getInt("value");
+                    totalDistance = distanceValue+totalDistance;
+                    JSONObject duration =((JSONObject) jLegs.get(j)).getJSONObject("duration");
+                    int durationValue = duration.getInt("value");
+                    totalDuration = durationValue+totalDuration;
+
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+        }
+        Log.d(TAG, "disdur    "+ totalDistance +"    "+ totalDuration);
+        disdur.add(totalDistance);
+        disdur.add(totalDuration);
+        return disdur;
     }
 }
