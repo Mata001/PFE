@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ClosestPointFinder {
     private static final double EARTH_RADIUS = 6371.0;
     private static final String TAG = "ClosestPointFinder";
-    private static final String API_KEY = "AIzaSyCnMasBoIdVpjj97TGyBUA44oC09BMxjUs";
+    private static final String API_KEY = "AIzaSyARlcOfXAA-JfGWFW6VH8AbtQbI96qjj6I";
     private static final int DESTINATION_LIMIT = 25;
     public static String origine;
     public static List<String> waypoints ;
