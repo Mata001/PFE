@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //----------------------------55------------------------------
         // Initialize Places.
         if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), "AIzaSyCnMasBoIdVpjj97TGyBUA44oC09BMxjUs");
+            Places.initialize(getApplicationContext(),"AIzaSyARlcOfXAA-JfGWFW6VH8AbtQbI96qjj6I");
         }
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
-                Toast.makeText(MainActivity.this, /*place.getLatLng()+*/  place.getName() +" is your destination", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, place.getLatLng() + place.getName() +" is your destination", Toast.LENGTH_SHORT).show();
 //              marker
                 if (destToClose.size() > 0) {
                     destToClose.clear();
@@ -354,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Mode for find direction
         String mod =  "mode=walking";
         //String key for api key
-        String key = "key=AIzaSyBXqq6EL6IwRunjoA9r7ctDwzikEaN1FEE";
+        String key = "key=AIzaSyARlcOfXAA-JfGWFW6VH8AbtQbI96qjj6I";
         //Build the full param
         String param = alt +"&"+ str_org +"&" +mod +"&"+ str_dest +"&"+ way+"&" +key;
         //Create url to request

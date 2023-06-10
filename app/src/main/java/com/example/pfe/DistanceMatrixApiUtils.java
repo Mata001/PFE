@@ -19,7 +19,8 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 public class DistanceMatrixApiUtils {
     private static final String TAG = "DistanceMatrixApiUtils";
-    private static final String API_KEY = "AIzaSyCnMasBoIdVpjj97TGyBUA44oC09BMxjUs";
+    private static final String API_KEY = "AIzaSyARlcOfXAA-JfGWFW6VH8AbtQbI96qjj6I";
+
     public static int closestDistance=Integer.MAX_VALUE;
     public static void getDistance(String origin, String destination, DistanceCallback callback) {
         String apiUrl = "https://maps.googleapis.com/maps/api/distancematrix/json";
@@ -39,7 +40,6 @@ public class DistanceMatrixApiUtils {
         @Override
         protected String doInBackground(String... urls) {
             String result = null;
-
             try {
                 URL url = new URL(urls[0]);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
