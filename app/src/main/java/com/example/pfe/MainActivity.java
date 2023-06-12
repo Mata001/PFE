@@ -123,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public int TOTALDISTANCE=0;
     int totaltram = 0;
 
+    boolean whichOne=false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -236,6 +238,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 closestplacefinder(place.getLatLng() , destinations,"tramway");
                 closestplacefinder(place.getLatLng(), destinationsH,"H");
+
+                new Handler().postDelayed(new Runnable(){
+                    @Override
+                    public void run() {
+                      whichOne =  acumilatorDurationDistance(objectfortram);
+
+                        Log.d(TAG, "run: " +whichOne + "    the tramway is the best");
+                    }
+                }, 5000);
+
+
 
             }
 
@@ -388,6 +401,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Create url to request
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + param;
         Log.d(TAG, "waypoints requested " + url);
+        waypptq.clear();
 
         return url;
     }
@@ -460,7 +474,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 objectfortram.add(jsonObject);
                 DirectionsParser directionsParser = new DirectionsParser();
                 routes = directionsParser.parse(jsonObject);
-                Log.d(TAG, "doInBackground: "+directionsParser.getdisdur(jsonObject));
+                Log.d(TAG, "doInBackground::: "+directionsParser.getdisdur(jsonObject));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -749,12 +763,7 @@ if (what=="tramway"){
                         requestPolyline(castStringToLatLng(dest.get(EClosestIndex)) , locdest , waypoints, "driving");
                     }
                 }, 1500);
-                new Handler().postDelayed(new Runnable(){
-                    @Override
-                    public void run() {
-                        acumilatorDurationDistance(objectfortram);
-                    }
-                }, 1000);
+
 //                            requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest, waypoints);
             } else {
                 for (int m = SClosestIndex + 1; m < SClosestIndex + 26; m++) {
@@ -786,15 +795,9 @@ if (what=="tramway"){
                         requestPolyline(castStringToLatLng(dest.get(SClosestIndex + 26)), locdest1, waypoints1, "driving");
 //                                    wayppt = waypoints2;
                         requestPolyline(castStringToLatLng(dest.get(EClosestIndex)), locdest2, waypoints2, "driving");
-                        acumilatorDurationDistance(objectfortram);
                     }
                 }, 500);
-                new Handler().postDelayed(new Runnable(){
-                    @Override
-                    public void run() {
-                        acumilatorDurationDistance(objectfortram);
-                    }
-                }, 1000);
+
 //                            requestPolyline(castStringToLatLng(destinations.get(SClosestIndex + 24)), locdest1, waypoints1);
             }
 
@@ -838,12 +841,7 @@ if (what=="tramway"){
                             requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)) , locdestH , waypointsH, "driving");
                         }
                     }, 1500);
-                    new Handler().postDelayed(new Runnable(){
-                        @Override
-                        public void run() {
-                            acumilatorDurationDistance(objectforH);
-                        }
-                    }, 1000);
+
 //                            requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest, waypoints);
                 } else {
                     for (int m = SClosestIndexH + 1; m < SClosestIndexH + 26; m++) {
@@ -877,39 +875,41 @@ if (what=="tramway"){
                             requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)), locdest2H, waypoints2H, "driving");
                         }
                     }, 500);
-                    new Handler().postDelayed(new Runnable(){
-                        @Override
-                        public void run() {
-                            acumilatorDurationDistance(objectforH);
-                        }
-                    }, 1000);
+
 //                            requestPolyline(castStringToLatLng(destinations.get(SClosestIndex + 24)), locdest1, waypoints1);
                 }
 
             }
         });
 
-    }}
-    public int acumilatorDurationDistance(ArrayList<JSONObject> object){
-        int total=0;
+    }
+    }
+    public boolean acumilatorDurationDistance(ArrayList<JSONObject> object){
+        int totalTram=0;
+        int totalH=0;
         DirectionsParser directionsParser = new DirectionsParser();
        // Log.d(TAG, "doInBackground:::::::::::::::::::::::::::::: "+directionsParser.getdisdur(objectfortram.get(0))+"   "+directionsParser.getdisdur(objectfortram.get(1))+"    "+directionsParser.getdisdur(objectfortram.get(2)));
         try {
-            if (object.size()==4){
-            total = directionsParser.getdisdur(object.get(0)).get(1)+directionsParser.getdisdur(object.get(1)).get(1)+(directionsParser.getdisdur(object.get(2)).get(1)+directionsParser.getdisdur(object.get(3)).get(1))/3;
-            Log.d(TAG, "acumilatorDurationDistance: "+ total);
-            object.clear();}
-            else if (object.size()==3){
-                total = directionsParser.getdisdur(object.get(0)).get(1)+directionsParser.getdisdur(object.get(1)).get(1)+directionsParser.getdisdur(object.get(2)).get(1)/3;
-                Log.d(TAG, "acumilatorDurationDistance: "+ total);
-                object.clear();
+            if (object.size()==8) {
+                totalTram = directionsParser.getdisdur(object.get(0)).get(1) + directionsParser.getdisdur(object.get(2)).get(1) + (directionsParser.getdisdur(object.get(4)).get(1) + directionsParser.getdisdur(object.get(5)).get(1)) / 3;
+                totalH = directionsParser.getdisdur(object.get(1)).get(1) + directionsParser.getdisdur(object.get(3)).get(1) + (directionsParser.getdisdur(object.get(6)).get(1) + directionsParser.getdisdur(object.get(7)).get(1)) / 3;
+                Log.d(TAG, "acumilatorDurationDistance: for tramway " + totalTram);
+                Log.d(TAG, "acumilatorDurationDistance: for H bus " + totalH);
             }
+            else if (object.size()==6){
+                totalTram = directionsParser.getdisdur(object.get(0)).get(1)+directionsParser.getdisdur(object.get(2)).get(1)+directionsParser.getdisdur(object.get(4)).get(1)/3;
+                totalH = directionsParser.getdisdur(object.get(1)).get(1)+directionsParser.getdisdur(object.get(3)).get(1)+directionsParser.getdisdur(object.get(5)).get(1)/3;
+                Log.d(TAG, "acumilatorDurationDistance:::: for tramway "+ totalTram);
+                Log.d(TAG, "acumilatorDurationDistance:::: for H bus "+ totalH);
+            }
+            object.clear();
         }catch (Exception e){
             Toast.makeText(this, "click on the location button first", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "acumilatorDurationDistance: " + e);
         }
-        return total;
+        return bestRoute(totalTram,totalH);
     }
-    public boolean bestRoute(int totaltram , int totalH){
-        return totaltram <= totalH;
+    public boolean bestRoute(int totalt , int totalth){
+        return totalt <= totalth;
     }
 }
