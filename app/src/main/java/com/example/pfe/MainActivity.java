@@ -123,9 +123,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public int TOTALDISTANCE=0;
     int totaltram = 0;
 
-    boolean whichOne=false;
+    boolean whichOne =false;
 
-
+    PolylineOptions polylineOptionsTram = null;
+    PolylineOptions ppTram = null;
+    PolylineOptions polylineOptionsH = null;
+    PolylineOptions ppH = null;
+    PolylineOptions polylineOptionsTramW = null;
+    PolylineOptions polylineOptionsHW = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -372,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     //Create the URL to get request from first marker to second marker
                     String url = getRequestUrl(listPoints.get(0), listPoints.get(1), wayppt);
                     TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
-                    taskRequestDirections.execute(url);
+                    taskRequestDirections.execute(url,"tramway");
                 }
             }
         });
@@ -442,10 +447,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     public class TaskRequestDirections extends AsyncTask<String, Void, String> {
 
+        String what;
         @Override
         protected String doInBackground(String... strings) {
+
             String responseString = "";
             try {
+                what = strings[1];
+                Log.d(TAG, "doInBackground:????????????? " + what);
                 responseString = requestDirection(strings[0]);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -459,16 +468,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             super.onPostExecute(s);
             //Parse json here
             TaskParser taskParser = new TaskParser();
-            taskParser.execute(s);
+            taskParser.execute(s, what);
         }
     }
 
     public class TaskParser extends AsyncTask<String, Void, List<List<HashMap<String, String>>>> {
 
+        String what;
         @Override
         protected List<List<HashMap<String, String>>> doInBackground(String... strings) {
             JSONObject jsonObject = null;
             List<List<HashMap<String, String>>> routes = null;
+            what = strings[1];
             try {
                 jsonObject = new JSONObject(strings[0]);
                 objectfortram.add(jsonObject);
@@ -486,13 +497,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         public void onPostExecute(List<List<HashMap<String, String>>> lists) {
             //Get list route and display it into the map
             ArrayList points = null;
-            PolylineOptions polylineOptions = null;
-            PolylineOptions pp = null;
 
+            if (what=="tramway"){
             for (List<HashMap<String, String>> path : lists) {
                 points = new ArrayList();
-                polylineOptions = new PolylineOptions();
-                pp = new PolylineOptions();
+
+                polylineOptionsTram = new PolylineOptions();
+                ppTram = new PolylineOptions();
+
                 for (HashMap<String, String> point : path) {
                     double lat = Double.parseDouble(point.get("lat"));
                     double lon = Double.parseDouble(point.get("lon"));
@@ -500,40 +512,96 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     points.add(new LatLng(lat, lon));
                 }
 
-                polylineOptions.addAll(points);
-                polylineOptions.width(25f);
-                polylineOptions.color(Color.argb(200,110, 0, 15));
-                polylineOptions.startCap(new RoundCap());
-                polylineOptions.endCap(new RoundCap());
-                polylineOptions.jointType(2);
-                polylineOptions.geodesic(true);
-                List<PatternItem> pattern;
                 if (mod){
-                    pp.addAll(points);
-                    pp.width(10f);
-                    pp.color(Color.argb(250,252, 3, 36));
-                    pp.startCap(new RoundCap());
-                    pp.endCap(new RoundCap());
-                    pp.jointType(2);
-                    pp.geodesic(true);
-                    pattern = Arrays.asList(new Dash(30));
-                }else {pattern = Arrays.asList(new Dot(),new Gap(15));
-                    polylineOptions.color(Color.argb(200,140, 222, 140));
-                    polylineOptions.width(20f);
-                    polylineOptions.pattern(pattern);}
+                    polylineOptionsTram.addAll(points);
+                    polylineOptionsTram.width(25f);
+                    polylineOptionsTram.color(Color.argb(200,110, 0, 15));
+                    polylineOptionsTram.startCap(new RoundCap());
+                    polylineOptionsTram.endCap(new RoundCap());
+                    polylineOptionsTram.jointType(2);
+                    polylineOptionsTram.geodesic(true);
+                    ppTram.addAll(points);
+                    ppTram.width(10f);
+                    ppTram.color(Color.argb(250,252, 3, 36));
+                    ppTram.startCap(new RoundCap());
+                    ppTram.endCap(new RoundCap());
+                    ppTram.jointType(2);
+                    ppTram.geodesic(true);
+                }else {
+                        polylineOptionsTramW=new PolylineOptions();
+                        List<PatternItem> pattern;
+                        pattern = Arrays.asList(new Dot(),new Gap(15));
+                        polylineOptionsTramW.addAll(points);
+                        polylineOptionsTramW.startCap(new RoundCap());
+                        polylineOptionsTramW.endCap(new RoundCap());
+                        polylineOptionsTramW.jointType(2);
+                        polylineOptionsTramW.geodesic(true);
+                        polylineOptionsTramW.color(Color.argb(200,140, 222, 140));
+                        polylineOptionsTramW.width(20f);
+                        polylineOptionsTramW.pattern(pattern);}}
 
                 Log.d(TAG, "onPostExecute: 1111111111111  " + mod);
 
-            }
-
-            if (polylineOptions != null) {
-                mMap.addPolyline(polylineOptions);
-                mMap.addPolyline(pp);
+            if (polylineOptionsTramW != null) {
+                Toast.makeText(getApplicationContext(), "GOOD", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getApplicationContext(), "Direction not found!", Toast.LENGTH_SHORT).show();
             }
 
-        }
+        }else{
+                for (List<HashMap<String, String>> path : lists) {
+                    points = new ArrayList();
+
+                    polylineOptionsH = new PolylineOptions();
+                    ppH = new PolylineOptions();
+                    for (HashMap<String, String> point : path) {
+                        double lat = Double.parseDouble(point.get("lat"));
+                        double lon = Double.parseDouble(point.get("lon"));
+
+                        points.add(new LatLng(lat, lon));
+                    }
+
+                    if (mod){
+                        polylineOptionsH.addAll(points);
+                        polylineOptionsH.width(25f);
+                        polylineOptionsH.color(Color.argb(200,110, 0, 15));
+                        polylineOptionsH.startCap(new RoundCap());
+                        polylineOptionsH.endCap(new RoundCap());
+                        polylineOptionsH.jointType(2);
+                        polylineOptionsH.geodesic(true);
+                        ppH.addAll(points);
+                        ppH.width(10f);
+                        ppH.color(Color.argb(250,252, 3, 36));
+                        ppH.startCap(new RoundCap());
+                        ppH.endCap(new RoundCap());
+                        ppH.jointType(2);
+                        ppH.geodesic(true);
+                    }else {
+                        polylineOptionsHW=new PolylineOptions();
+                        List<PatternItem> pattern;
+                        pattern = Arrays.asList(new Dot(),new Gap(15));
+                        polylineOptionsHW.addAll(points);
+                        polylineOptionsHW.startCap(new RoundCap());
+                        polylineOptionsHW.endCap(new RoundCap());
+                        polylineOptionsHW.jointType(2);
+                        polylineOptionsHW.geodesic(true);
+                        polylineOptionsHW.color(Color.argb(200,140, 222, 140));
+                        polylineOptionsHW.width(20f);
+                        polylineOptionsHW.pattern(pattern);}
+
+                    Log.d(TAG, "onPostExecute: 1111111111111  " + mod);
+
+                }
+
+                if (polylineOptionsHW != null) {
+                    Toast.makeText(getApplicationContext(), "GOOD", Toast.LENGTH_SHORT).show();
+                    //mMap.addPolyline(pp);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Direction not found!", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+            }
     }
 
     private void enableCurrentLocation() {
@@ -639,7 +707,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return latLng;
     }
 
-    public void requestPolyline(LatLng latLng , ArrayList<LatLng> lol, List<String> waypptw, String mode) {
+    public void requestPolyline(LatLng latLng , ArrayList<LatLng> lol, List<String> waypptw, String mode , String what) {
         mod = modeProvider(mode);
         Log.d(TAG, "requestPolyline: mode is "  +mod +"       " + mode);
         //Reset marker when already 2
@@ -669,14 +737,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Create the URL to get request from first marker to second marker
             String url = getRequestUrl(lol.get(0), lol.get(1), waypptw);
             TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
-            taskRequestDirections.execute(url);
+            taskRequestDirections.execute(url,what);
         }
     }
 
     public boolean modeProvider(String modee){
         return modee != "walking";
     }
- public void closestfinder(LatLng latLng , ArrayList<String> dest, String what){
+ public void closestfinder(LatLng latLng , ArrayList<String> dest, String what) {
 if (what=="tramway"){
         ClosestPointFinder.findClosestPoint(latlngToString(latLng), dest, new ClosestPointFinder.DistanceCallback() {
             @Override
@@ -695,7 +763,7 @@ if (what=="tramway"){
                 SClosestIndex = dest.indexOf(closestPoint);
                 Log.d(TAG, " index Start " + SClosestIndex);
                 Log.d(TAG, "Closest point to current location: " + closestPoint);
-                requestPolyline(castStringToLatLng(closestPoint), locToClose, empty, "walking");
+                requestPolyline(castStringToLatLng(closestPoint), locToClose, empty, "walking", what);
                 Log.d(TAG, "onClosestPointReceived: it's this one bro"  + closestPoint  );
 
             }
@@ -717,7 +785,7 @@ if (what=="tramway"){
         SClosestIndexH = dest.indexOf(closestPoint);
         Log.d(TAG, " index Start " + SClosestIndexH);
         Log.d(TAG, "Closest point to current location: " + closestPoint);
-        requestPolyline(castStringToLatLng(closestPoint), locToCloseH, empty, "walking");
+        requestPolyline(castStringToLatLng(closestPoint), locToCloseH, empty, "walking",what);
         Log.d(TAG, "onClosestPointReceived: it's this one bro"  + closestPoint  );
 
     }
@@ -744,7 +812,7 @@ if (what=="tramway"){
             EClosestIndex = dest.indexOf(closestPoint);
             Log.d(TAG, "index ta destination" + EClosestIndex);
             Log.d(TAG, "Closest point to Destination: " + closestPoint);
-            requestPolyline(castStringToLatLng(closestPoint), destToClose, empty, "walking");
+            requestPolyline(castStringToLatLng(closestPoint), destToClose, empty, "walking", what);
             if (EClosestIndex>=SClosestIndex){
             wpptNb = EClosestIndex - SClosestIndex - 1;
 
@@ -761,7 +829,7 @@ if (what=="tramway"){
                 new Handler().postDelayed(new Runnable(){
                     @Override
                     public void run() {
-                        requestPolyline(castStringToLatLng(dest.get(EClosestIndex)) , locdest , waypoints, "driving");
+                        requestPolyline(castStringToLatLng(dest.get(EClosestIndex)) , locdest , waypoints, "driving",what);
                     }
                 }, 1500);
 
@@ -793,9 +861,9 @@ if (what=="tramway"){
                     public void run() {
 
 //                                    wayppt = waypoints1;
-                        requestPolyline(castStringToLatLng(dest.get(SClosestIndex + 26)), locdest1, waypoints1, "driving");
+                        requestPolyline(castStringToLatLng(dest.get(SClosestIndex + 26)), locdest1, waypoints1, "driving",what);
 //                                    wayppt = waypoints2;
-                        requestPolyline(castStringToLatLng(dest.get(EClosestIndex)), locdest2, waypoints2, "driving");
+                        requestPolyline(castStringToLatLng(dest.get(EClosestIndex)), locdest2, waypoints2, "driving",what);
                     }
                 }, 500);
 
@@ -818,7 +886,7 @@ if (what=="tramway"){
                     new Handler().postDelayed(new Runnable(){
                         @Override
                         public void run() {
-                            requestPolyline(castStringToLatLng(dest.get(EClosestIndex)) , locdest , waypoints, "driving");
+                            requestPolyline(castStringToLatLng(dest.get(EClosestIndex)) , locdest , waypoints, "driving",what);
                         }
                     }, 1500);
 
@@ -850,9 +918,9 @@ if (what=="tramway"){
                         public void run() {
 
 //                                    wayppt = waypoints1;
-                            requestPolyline(castStringToLatLng(dest.get(SClosestIndex - 26)), locdest1, waypoints1, "driving");
+                            requestPolyline(castStringToLatLng(dest.get(SClosestIndex - 26)), locdest1, waypoints1, "driving",what);
 //                                    wayppt = waypoints2;
-                            requestPolyline(castStringToLatLng(dest.get(EClosestIndex)), locdest2, waypoints2, "driving");
+                            requestPolyline(castStringToLatLng(dest.get(EClosestIndex)), locdest2, waypoints2, "driving",what);
                         }
                     }, 500);
 
@@ -881,7 +949,7 @@ if (what=="tramway"){
                 EClosestIndexH = dest.indexOf(closestPoint);
                 Log.d(TAG, "index ta destination" + EClosestIndexH);
                 Log.d(TAG, "Closest point to Destination: " + closestPoint);
-                requestPolyline(castStringToLatLng(closestPoint), destToCloseH, empty, "walking");
+                requestPolyline(castStringToLatLng(closestPoint), destToCloseH, empty, "walking",what);
                 if (EClosestIndex>=SClosestIndex) {
                     wpptNbH = EClosestIndexH - SClosestIndexH - 1;
 
@@ -898,7 +966,7 @@ if (what=="tramway"){
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)), locdestH, waypointsH, "driving");
+                                requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)), locdestH, waypointsH, "driving",what);
                             }
                         }, 1500);
 
@@ -930,9 +998,9 @@ if (what=="tramway"){
                             public void run() {
 
 //                                    wayppt = waypoints1;
-                                requestPolyline(castStringToLatLng(dest.get(SClosestIndexH + 26)), locdest1H, waypoints1H, "driving");
+                                requestPolyline(castStringToLatLng(dest.get(SClosestIndexH + 26)), locdest1H, waypoints1H, "driving",what);
 //                                    wayppt = waypoints2;
-                                requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)), locdest2H, waypoints2H, "driving");
+                                requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)), locdest2H, waypoints2H, "driving",what);
                             }
                         }, 500);
 
@@ -955,7 +1023,7 @@ if (what=="tramway"){
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)), locdestH, waypointsH, "driving");
+                                requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)), locdestH, waypointsH, "driving",what);
                             }
                         }, 1500);
 
@@ -987,9 +1055,9 @@ if (what=="tramway"){
                             public void run() {
 
 //                                    wayppt = waypoints1;
-                                requestPolyline(castStringToLatLng(dest.get(SClosestIndexH - 26)), locdest1H, waypoints1H, "driving");
+                                requestPolyline(castStringToLatLng(dest.get(SClosestIndexH - 26)), locdest1H, waypoints1H, "driving",what);
 //                                    wayppt = waypoints2;
-                                requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)), locdest2H, waypoints2H, "driving");
+                                requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)), locdest2H, waypoints2H, "driving",what);
                             }
                         }, 500);
 
@@ -1027,6 +1095,15 @@ if (what=="tramway"){
         return bestRoute(totalTram,totalH);
     }
     public boolean bestRoute(int totalt , int totalth){
+        if (totalt<=totalth){
+            mMap.addPolyline(polylineOptionsTramW);
+            mMap.addPolyline(polylineOptionsTram);
+            mMap.addPolyline(ppTram);
+        }else {
+            mMap.addPolyline(polylineOptionsHW);
+            mMap.addPolyline(polylineOptionsH);
+            mMap.addPolyline(ppH);
+        }
         return totalt <= totalth;
     }
 }
