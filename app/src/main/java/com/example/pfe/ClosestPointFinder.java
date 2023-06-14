@@ -1,4 +1,5 @@
 package com.example.pfe;
+
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
@@ -6,7 +7,6 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static java.lang.Math.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -56,6 +56,7 @@ public class ClosestPointFinder {
                     @Override
                     public void onClosestPointReceived(String closestPoint) {
                         closestPoints.add(closestPoint);
+//                        Log.d(TAG, "haaahowaa "+closestIndexArg);
                         remainingRequests.decrementAndGet();
                         checkAllRequestsCompleted(callback, closestPoints, remainingRequests.get());
                     }
@@ -154,45 +155,46 @@ public class ClosestPointFinder {
     }
 
 
-        private static List<List<String>> chunkDestinations(List<String> destinations, int chunkSize) {
-            List<List<String>> chunks = new ArrayList<>();
-            int numDestinations = destinations.size();
-            int numChunks = (int) Math.ceil((double) numDestinations / chunkSize);
+    private static List<List<String>> chunkDestinations(List<String> destinations, int chunkSize) {
+        List<List<String>> chunks = new ArrayList<>();
+        int numDestinations = destinations.size();
+        int numChunks = (int) Math.ceil((double) numDestinations / chunkSize);
 
-            for (int i = 0; i < numChunks; i++) {
-                int startIndex = i * chunkSize;
-                int endIndex = Math.min((i + 1) * chunkSize, numDestinations);
-                List<String> chunk = destinations.subList(startIndex, endIndex);
-                chunks.add(chunk);
-            }
-
-            return chunks;
+        for (int i = 0; i < numChunks; i++) {
+            int startIndex = i * chunkSize;
+            int endIndex = Math.min((i + 1) * chunkSize, numDestinations);
+            List<String> chunk = new ArrayList<>(destinations.subList(startIndex, endIndex));
+            chunks.add(chunk);
         }
 
-        private static void checkAllRequestsCompleted(DistanceCallback callback, List<String> closestPoints, int remainingRequests) {
-            if (remainingRequests == 0) {
-                if (!closestPoints.isEmpty()) {
-                    String closestPoint = findClosestPoint(closestPoints);
-                    callback.onClosestPointReceived(closestPoint);
-                } else {
-                    callback.onDistanceFailed();
-                }
+        return chunks;
+    }
+
+    private static void checkAllRequestsCompleted(DistanceCallback callback, List<String> closestPoints, int remainingRequests) {
+        if (remainingRequests == 0) {
+            if (!closestPoints.isEmpty()) {
+                String closestPoint = findClosestPoint(closestPoints);
+                callback.onClosestPointReceived(closestPoint);
+            } else {
+                callback.onDistanceFailed();
             }
         }
+    }
 
-        private static String findClosestPoint(List<String> points) {
-            double minDistance = Double.MAX_VALUE;
-            String closestPoint = null;
-            for (String point : points) {
-                double distance = calculateEuclideanDistance(origine, point);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestPoint = point;
-                }
+    private static String findClosestPoint(List<String> points) {
+        double minDistance = Double.MAX_VALUE;
+        String closestPoint = null;
+        for (String point : points) {
+            double distance = calculateEuclideanDistance(origine, point);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestPoint = point;
             }
 
-            return closestPoint;
         }
+//        Log.d(TAG, "findClosestPoint fel comparison "+closestPoint);
+        return closestPoint;
+    }
 
     private static double calculateEuclideanDistance(String point1, String point2) {
         // Assuming the points are in latitude-longitude format (e.g., "latitude,longitude")
@@ -211,16 +213,16 @@ public class ClosestPointFinder {
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double distance = EARTH_RADIUS * c;
-
+//        Log.d(TAG, "calculateEuclideanDistance: bin zouj  "+ distance);
         return distance;
-        }
+    }
 
-        public interface DistanceCallback {
-            void onDistanceReceived(int distance);
+    public interface DistanceCallback {
+        void onDistanceReceived(int distance);
 
-            void onDistanceFailed();
+        void onDistanceFailed();
 
-            void onClosestPointReceived(String closestPoint);
-        }
+        void onClosestPointReceived(String closestPoint);
+    }
 
 }
