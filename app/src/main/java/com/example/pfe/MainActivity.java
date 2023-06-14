@@ -745,6 +745,7 @@ if (what=="tramway"){
             Log.d(TAG, "index ta destination" + EClosestIndex);
             Log.d(TAG, "Closest point to Destination: " + closestPoint);
             requestPolyline(castStringToLatLng(closestPoint), destToClose, empty, "walking");
+            if (EClosestIndex>=SClosestIndex){
             wpptNb = EClosestIndex - SClosestIndex - 1;
 
 
@@ -801,7 +802,65 @@ if (what=="tramway"){
 //                            requestPolyline(castStringToLatLng(destinations.get(SClosestIndex + 24)), locdest1, waypoints1);
             }
 
-        }
+        }else{
+                wpptNb = -EClosestIndex + SClosestIndex + 1;
+
+
+                if (wpptNb < 26) {
+                    for (int j = SClosestIndex - 1; j > EClosestIndex; j--) {
+                        waypoints.add(dest.get(j));
+                    }
+                    Log.d(TAG, "wahd " + waypoints);
+                    if (locdest.size() > 0) {
+                        locdest.clear();
+                    }
+                    locdest.add(castStringToLatLng(dest.get(SClosestIndex)));
+                    new Handler().postDelayed(new Runnable(){
+                        @Override
+                        public void run() {
+                            requestPolyline(castStringToLatLng(dest.get(EClosestIndex)) , locdest , waypoints, "driving");
+                        }
+                    }, 1500);
+
+//                            requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest, waypoints);
+                } else {
+                    for (int m = SClosestIndex - 1; m > SClosestIndex - 26; m--) {
+                        waypoints1.add(dest.get(m));
+                    }
+                    for (int n = SClosestIndex - 27; n > EClosestIndex + 1; n--) {
+                        waypoints2.add(dest.get(n));
+                    }
+
+                    Log.d(TAG, "lowl " + waypoints1);
+                    Log.d(TAG, "tani " + waypoints2);
+                    if (locdest1.size() > 0) {
+                        locdest1.clear();
+                    }
+                    locdest1.add(castStringToLatLng(dest.get(SClosestIndex)));
+
+                    if (locdest2.size() > 0) {
+                        locdest2.clear();
+                    }
+                    locdest2.add(castStringToLatLng(dest.get(SClosestIndex - 26)));
+
+//                            wayppt = waypoints1;
+//                            wayppt = waypoints2;
+                    new Handler().postDelayed(new Runnable(){
+                        @Override
+                        public void run() {
+
+//                                    wayppt = waypoints1;
+                            requestPolyline(castStringToLatLng(dest.get(SClosestIndex - 26)), locdest1, waypoints1, "driving");
+//                                    wayppt = waypoints2;
+                            requestPolyline(castStringToLatLng(dest.get(EClosestIndex)), locdest2, waypoints2, "driving");
+                        }
+                    }, 500);
+
+//                            requestPolyline(castStringToLatLng(destinations.get(SClosestIndex + 24)), locdest1, waypoints1);
+                }
+
+            }
+            }
     });}else {
         ClosestPointFinder.findClosestPoint(latlngToString(latLng), dest, new ClosestPointFinder.DistanceCallback() {
             String TAG = " ";
@@ -823,63 +882,121 @@ if (what=="tramway"){
                 Log.d(TAG, "index ta destination" + EClosestIndexH);
                 Log.d(TAG, "Closest point to Destination: " + closestPoint);
                 requestPolyline(castStringToLatLng(closestPoint), destToCloseH, empty, "walking");
-                wpptNbH = EClosestIndexH - SClosestIndexH - 1;
+                if (EClosestIndex>=SClosestIndex) {
+                    wpptNbH = EClosestIndexH - SClosestIndexH - 1;
 
 
-                if (wpptNbH < 26) {
-                    for (int j = SClosestIndexH + 1; j < EClosestIndexH; j++) {
-                        waypointsH.add(dest.get(j));
-                    }
-                    Log.d(TAG, "wahd " + waypointsH);
-                    if (locdestH.size() > 0) {
-                        locdestH.clear();
-                    }
-                    locdestH.add(castStringToLatLng(dest.get(SClosestIndexH)));
-                    new Handler().postDelayed(new Runnable(){
-                        @Override
-                        public void run() {
-                            requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)) , locdestH , waypointsH, "driving");
+                    if (wpptNbH < 26) {
+                        for (int j = SClosestIndexH + 1; j < EClosestIndexH; j++) {
+                            waypointsH.add(dest.get(j));
                         }
-                    }, 1500);
+                        Log.d(TAG, "wahd " + waypointsH);
+                        if (locdestH.size() > 0) {
+                            locdestH.clear();
+                        }
+                        locdestH.add(castStringToLatLng(dest.get(SClosestIndexH)));
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)), locdestH, waypointsH, "driving");
+                            }
+                        }, 1500);
 
 //                            requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest, waypoints);
-                } else {
-                    for (int m = SClosestIndexH + 1; m < SClosestIndexH + 26; m++) {
-                        waypoints1H.add(dest.get(m));
-                    }
-                    for (int n = SClosestIndexH + 27; n < EClosestIndexH - 1; n++) {
-                        waypoints2H.add(dest.get(n));
-                    }
+                    } else {
+                        for (int m = SClosestIndexH + 1; m < SClosestIndexH + 26; m++) {
+                            waypoints1H.add(dest.get(m));
+                        }
+                        for (int n = SClosestIndexH + 27; n < EClosestIndexH - 1; n++) {
+                            waypoints2H.add(dest.get(n));
+                        }
 
-                    Log.d(TAG, "lowl " + waypoints1H);
-                    Log.d(TAG, "tani " + waypoints2H);
-                    if (locdest1H.size() > 0) {
-                        locdest1H.clear();
-                    }
-                    locdest1H.add(castStringToLatLng(dest.get(SClosestIndexH)));
+                        Log.d(TAG, "lowl " + waypoints1H);
+                        Log.d(TAG, "tani " + waypoints2H);
+                        if (locdest1H.size() > 0) {
+                            locdest1H.clear();
+                        }
+                        locdest1H.add(castStringToLatLng(dest.get(SClosestIndexH)));
 
-                    if (locdest2H.size() > 0) {
-                        locdest2H.clear();
-                    }
-                    locdest2H.add(castStringToLatLng(dest.get(SClosestIndexH + 26)));
+                        if (locdest2H.size() > 0) {
+                            locdest2H.clear();
+                        }
+                        locdest2H.add(castStringToLatLng(dest.get(SClosestIndexH + 26)));
 
 //                            wayppt = waypoints1;
 //                            wayppt = waypoints2;
-                    new Handler().postDelayed(new Runnable(){
-                        @Override
-                        public void run() {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
 
 //                                    wayppt = waypoints1;
-                            requestPolyline(castStringToLatLng(dest.get(SClosestIndexH + 26)), locdest1H, waypoints1H, "driving");
+                                requestPolyline(castStringToLatLng(dest.get(SClosestIndexH + 26)), locdest1H, waypoints1H, "driving");
 //                                    wayppt = waypoints2;
-                            requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)), locdest2H, waypoints2H, "driving");
-                        }
-                    }, 500);
+                                requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)), locdest2H, waypoints2H, "driving");
+                            }
+                        }, 500);
 
 //                            requestPolyline(castStringToLatLng(destinations.get(SClosestIndex + 24)), locdest1, waypoints1);
-                }
+                    }
 
-            }
+                }else {
+                    wpptNbH = -EClosestIndexH + SClosestIndexH + 1;
+
+
+                    if (wpptNbH < 26) {
+                        for (int j = SClosestIndexH - 1; j > EClosestIndexH; j--) {
+                            waypointsH.add(dest.get(j));
+                        }
+                        Log.d(TAG, "wahd " + waypointsH);
+                        if (locdestH.size() > 0) {
+                            locdestH.clear();
+                        }
+                        locdestH.add(castStringToLatLng(dest.get(SClosestIndexH)));
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)), locdestH, waypointsH, "driving");
+                            }
+                        }, 1500);
+
+//                            requestPolyline(castStringToLatLng(destinations.get(EClosestIndex)), locdest, waypoints);
+                    } else {
+                        for (int m = SClosestIndexH - 1; m > SClosestIndexH - 26; m--) {
+                            waypoints1H.add(dest.get(m));
+                        }
+                        for (int n = SClosestIndexH - 27; n > EClosestIndexH - 1; n--) {
+                            waypoints2H.add(dest.get(n));
+                        }
+
+                        Log.d(TAG, "lowl " + waypoints1H);
+                        Log.d(TAG, "tani " + waypoints2H);
+                        if (locdest1H.size() > 0) {
+                            locdest1H.clear();
+                        }
+                        locdest1H.add(castStringToLatLng(dest.get(SClosestIndexH)));
+
+                        if (locdest2H.size() > 0) {
+                            locdest2H.clear();
+                        }
+                        locdest2H.add(castStringToLatLng(dest.get(SClosestIndexH - 26)));
+
+//                            wayppt = waypoints1;
+//                            wayppt = waypoints2;
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+
+//                                    wayppt = waypoints1;
+                                requestPolyline(castStringToLatLng(dest.get(SClosestIndexH - 26)), locdest1H, waypoints1H, "driving");
+//                                    wayppt = waypoints2;
+                                requestPolyline(castStringToLatLng(dest.get(EClosestIndexH)), locdest2H, waypoints2H, "driving");
+                            }
+                        }, 500);
+
+//                            requestPolyline(castStringToLatLng(destinations.get(SClosestIndex + 24)), locdest1, waypoints1);
+                    }
+
+                }}
         });
 
     }
