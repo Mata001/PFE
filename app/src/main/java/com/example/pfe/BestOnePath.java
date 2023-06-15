@@ -179,7 +179,7 @@ public class BestOnePath implements OnMapReadyCallback {
             Log.d(TAG, "urls ta direction ki maykounch chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url);
         } else if (lista.size() == 8) {
             String url1 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(2)), castObjectToLatLng(lista.get(6)), castObjectToList(lista.get(5)));
-            String url2 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(6)), castObjectToLatLng(lista.get(5)), castObjectToList(lista.get(7)));
+            String url2 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(6)), castObjectToLatLng(lista.get(4)), castObjectToList(lista.get(7)));
             Log.d(TAG, "urls ta direction ki ykoun chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url1 + "\n" + url2);
         } else {
             Log.d(TAG, "ak ghalt sa7bi me ttali ");
@@ -197,8 +197,8 @@ public class BestOnePath implements OnMapReadyCallback {
     }
 
     public List<String> castObjectToList(Object object) {
-        List<String> waypointsList = new ArrayList<>();
-        waypointsList = (List<String>) object;
+        List<String> waypointsList = new ArrayList<>((List<String>) object);
+//        waypointsList = (List<String>) object;
         return waypointsList;
     }
 }
