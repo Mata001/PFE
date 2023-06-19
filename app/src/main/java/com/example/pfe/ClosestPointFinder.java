@@ -28,20 +28,20 @@ public class ClosestPointFinder {
     public static int iti=1;
     public static void findClosestPoint(String origin, List<String> destinations, DistanceCallback callback) {
 //        origine = origin;
-        Log.d(TAG, "origin 1 "+origin);
+//        Log.d(TAG, "origin 1 "+origin);
         int numDestinations = destinations.size();
         if (numDestinations <= DESTINATION_LIMIT) {
             // If the number of destinations is within the limit, make a single request
-            Log.d(TAG, "origin 2 "+origin);
+//            Log.d(TAG, "origin 2 "+origin);
             makeDistanceRequest(origin, destinations, callback);
         } else {
             // If the number of destinations exceeds the limit, paginate through the results
             List<List<String>> destinationChunks = chunkDestinations(destinations, DESTINATION_LIMIT);
             List<String> closestPoints = new ArrayList<>();
             AtomicInteger remainingRequests = new AtomicInteger(destinationChunks.size());
-            Log.d(TAG, "origin 3 "+origin);
+//            Log.d(TAG, "origin 3 "+origin);
             for (List<String> chunk : destinationChunks) {
-                Log.d(TAG, "origin loop "+origin);
+//                Log.d(TAG, "origin loop "+origin);
                 makeDistanceRequest(origin, chunk, new DistanceCallback() {
                     @Override
                     public void onDistanceReceived(int distance) {
@@ -72,9 +72,9 @@ public class ClosestPointFinder {
         String destinationsString = TextUtils.join("|", destinations);
         String params = "key=" + API_KEY + "&origins=" + origin + "&destinations=" + destinationsString;
         String url = apiUrl + params;
-        Log.d(TAG, "makeDistanceRequest: URL = " +url);
+//        Log.d(TAG, "makeDistanceRequest: URL = " +url);
 
-        Log.d(TAG, "origin 4 "+origin);
+//        Log.d(TAG, "origin 4 "+origin);
 //        origine=origin;
         new DistanceMatrixTask(callback, destinations).execute(url);
     }
@@ -140,7 +140,7 @@ public class ClosestPointFinder {
                             closestIndex = i;
                         }
                     }
-                    Log.d(TAG, "request numero: "+iti +" index ta lpoint lgrib fe chunk : "+closestIndex);
+//                    Log.d(TAG, "request numero: "+iti +" index ta lpoint lgrib fe chunk : "+closestIndex);
                     iti++;
 
                     if (closestIndex != -1) {
@@ -179,7 +179,7 @@ public class ClosestPointFinder {
     private static void checkAllRequestsCompleted(DistanceCallback callback, List<String> closestPoints, int remainingRequests, String origin) {
         if (remainingRequests == 0) {
             if (!closestPoints.isEmpty()) {
-                Log.d(TAG, "hadouhouma les 2 points ta kol request li rah ycompari distance ta3hm "+closestPoints);
+//                Log.d(TAG, "hadouhouma les 2 points ta kol request li rah ycompari distance ta3hm "+closestPoints);
                 String closestPoint = findClosestPoint(closestPoints,origin);
                 callback.onClosestPointReceived(closestPoint);
             } else {
@@ -191,22 +191,22 @@ public class ClosestPointFinder {
     private static String findClosestPoint(List<String> points, String origin) {
         double minDistance = Double.MAX_VALUE;
         String closestPoint = null;
-        Log.d(TAG, "origin 5 "+origin);
+//        Log.d(TAG, "origin 5 "+origin);
         for (String point : points) {
             double distance = calculateEuclideanDistance(origin, point);
-            Log.d(TAG, "distance ta koul point men "+origin+ "  7atta lel "+point+ " hiya "+distance);
+//            Log.d(TAG, "distance ta koul point men "+origin+ "  7atta lel "+point+ " hiya "+distance);
             if (distance < minDistance) {
                 minDistance = distance;
                 closestPoint = point;
             }
         }
-        Log.d(TAG, "ClosestPoint fel comparison "+closestPoint+ " psk la distance sghir "+minDistance);
+//        Log.d(TAG, "ClosestPoint fel comparison "+closestPoint+ " psk la distance sghir "+minDistance);
         return closestPoint;
     }
 
     private static double calculateEuclideanDistance(String point1, String point2) {
         // Assuming the points are in latitude-longitude format (e.g., "latitude,longitude")
-        Log.d(TAG, "origin 6 "+ point1);
+//        Log.d(TAG, "origin 6 "+ point1);
         double lat1 = Double.parseDouble(point1.split(",")[0]);
         double lon1 = Double.parseDouble(point1.split(",")[1]);
         double lat2 = Double.parseDouble(point2.split(",")[0]);
