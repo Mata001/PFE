@@ -149,38 +149,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 BestOnePath.distances.clear();
                 shortestDistance = Integer.MAX_VALUE;
                 lakhra = new ArrayList<>();
+                BestOnePath.polylineNumbers.clear();
+                BestOnePath.polylineOptionsArrayList.clear();
+                mMap.clear();
 
                 bestOnePath.readData(new BestOnePath.FirebaseCallback() {
                     @Override
                     public void onCallback(ArrayList<Object> list, long number) {
-                        listOfLists = new ArrayList<>(list);
-                        lakhra.add(listOfLists);
-                        Log.d(TAG, "list of lists "+listOfLists);
-                        Log.d(TAG, "lakhra "+lakhra);
-//                        iterator++;
-//                        requestPolyline();
-                        if (lakhra.size() == number ){
-                            if (locdest.size() > 0) {
-                                locdest.clear();
-                            }
-
-                            LatLng latLng2 = bestOnePath.castObjectToLatLng(lakhra.get(2).get(6));
-                            locdest.add(latLng2);
-                            LatLng latLng1 = bestOnePath.castObjectToLatLng(lakhra.get(2).get(4));
-                            List<String> ways= bestOnePath.castObjectToList(lakhra.get(2).get(7));
-
-                            new Handler().postDelayed(new Runnable(){
-                                @Override
-                                public void run() {
-
-                                    requestPolyline(latLng1,locdest,ways,"walking");
-                                }
-                            }, 500);
-
-                        }
                     }
                 },latlngToString(place.getLatLng()));
             }
+
 
             @Override
             public void onError(@NonNull Status status) {
