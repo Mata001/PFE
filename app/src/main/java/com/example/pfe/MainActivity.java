@@ -158,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     public void onCallback(ArrayList<Object> list, long number) {
                     }
                 },latlngToString(place.getLatLng()),latlngToString(locdest1.get(0)));
+//                latlngToString(locdest1.get(0))
             }
 
 

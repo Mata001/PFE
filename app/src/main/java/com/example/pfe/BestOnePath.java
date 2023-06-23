@@ -156,7 +156,7 @@ public class BestOnePath implements OnMapReadyCallback {
                                 } else if (SClosestIndex > EClosestIndex) {
                                     wpptNb = -EClosestIndex + SClosestIndex - 1;
                                     if (wpptNb < 26) {
-                                        waypoints = destinations.subList(EClosestIndex + 1, SClosestIndex - 1);
+                                        waypoints = destinations.subList(EClosestIndex + 1, SClosestIndex);
                                         Log.d(TAG, "wahd " + waypoints);
                                         info.add(waypoints);
                                     } else if (wpptNb > 25) {
