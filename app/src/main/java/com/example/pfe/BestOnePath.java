@@ -132,10 +132,11 @@ public class BestOnePath implements OnMapReadyCallback {
                                 getInfo(info);
                                 firebaseCallback.onCallback(info, meanNb);
                             } else if (EClosestIndex != SClosestIndex) {
-                                wpptNb = -EClosestIndex + SClosestIndex - 1;
+//                                wpptNb = -EClosestIndex + SClosestIndex - 1;
                                 info.add(EClosestIndex);
                                 info.add(closestPoint);
                                 if (EClosestIndex > SClosestIndex) {
+                                    wpptNb = EClosestIndex - SClosestIndex - 1;
                                     if (wpptNb < 26) {
                                         waypoints = destinations.subList(SClosestIndex + 1, EClosestIndex);
                                         Log.d(TAG, "wahd " + waypoints);
@@ -153,6 +154,7 @@ public class BestOnePath implements OnMapReadyCallback {
                                     firebaseCallback.onCallback(info, meanNb);
 
                                 } else if (SClosestIndex > EClosestIndex) {
+                                    wpptNb = -EClosestIndex + SClosestIndex - 1;
                                     if (wpptNb < 26) {
                                         waypoints = destinations.subList(EClosestIndex + 1, SClosestIndex - 1);
                                         Log.d(TAG, "wahd " + waypoints);
