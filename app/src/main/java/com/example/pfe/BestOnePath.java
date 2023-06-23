@@ -428,7 +428,7 @@ public class BestOnePath implements OnMapReadyCallback {
 
 //                    MainActivity.mMap.addPolyline(polylineOptions);
                     polylineOptionsArrayList.add(polylineOptions);
-                    if (polylineOptionsArrayList.size()  == 9){
+                    if (polylineOptionsArrayList.size()  == totalNbPoly){
                         for (int i = 0; i< distances.indexOf(MainActivity.shortestDistance); i++){
                             Log.d(TAG, "indexx "+distances.indexOf(MainActivity.shortestDistance));
                             Log.d(TAG, "polynumbers "+polylineNumbers);
