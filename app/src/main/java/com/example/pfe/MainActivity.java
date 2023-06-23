@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onCallback(ArrayList<Object> list, long number) {
                     }
-                },latlngToString(place.getLatLng()));
+                },latlngToString(place.getLatLng()),latlngToString(locdest1.get(0)));
             }
 
 
@@ -190,6 +190,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     // Move the camera to the user's current location
                     LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                     moveCameraToLocation(currentLatLng, 15);
+                    locdest1.clear();
+                    locdest1.add(currentLatLng);
                 } else {
                     Toast.makeText(MainActivity.this, "Unable to get current location", Toast.LENGTH_SHORT).show();
                 }
@@ -323,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Create the URL to get request from first marker to second marker
             String url = getRequestUrl(lol.get(0), lol.get(1), wayppt);
             BestOnePath.TaskRequestDirections taskRequestDirections = new BestOnePath.TaskRequestDirections();
-            taskRequestDirections.execute(url,"1",drawTrue);
+            taskRequestDirections.execute(url,"1");
         }
     }
 

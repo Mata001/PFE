@@ -64,7 +64,8 @@ public class BestOnePath implements OnMapReadyCallback {
 
     }
 
-    public void readData(FirebaseCallback firebaseCallback, String destination) {
+    public void readData(FirebaseCallback firebaseCallback, String destination,String origin) {
+        Log.d(TAG, "origin "+origin);
 //        ArrayList<Object> info = new ArrayList<>();
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -85,7 +86,7 @@ public class BestOnePath implements OnMapReadyCallback {
                         destinations.add(modelTram.getCoordinates());
                     }
                     Log.d(TAG, "Mean :" + meanName + ", Number :" + end + ", Stations :" + destinations);
-                    ClosestPointFinder.findClosestPoint("35.693350,-0.621150", destinations, new ClosestPointFinder.DistanceCallback() {
+                    ClosestPointFinder.findClosestPoint(origin, destinations, new ClosestPointFinder.DistanceCallback() {
                         @Override
                         public void onDistanceReceived(int distance) {
                             Log.d(TAG, "distances dest " + distance);
@@ -101,7 +102,7 @@ public class BestOnePath implements OnMapReadyCallback {
                             SClosestIndex = destinations.indexOf(closestPoint);
                             Log.d(TAG, "index ta Origin " + SClosestIndex);
                             info.clear();
-                            info.add("35.693350,-0.621150");
+                            info.add(origin);
                             info.add(destination);
                             info.add(meanName);
                             info.add(SClosestIndex);
