@@ -4,11 +4,10 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
@@ -28,14 +27,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Dash;
-import com.google.android.gms.maps.model.Dot;
-import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PatternItem;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.maps.model.RoundCap;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -47,24 +40,17 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static String TAG = "info:";
-    private static GoogleMap mMap;
+    public static GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationManager locationManager;
     public static final int TIME_INTERVAL = 2000;
@@ -89,8 +75,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ArrayList<LatLng> locdest2;
     public static ArrayList<JSONObject> meanObject;
     static boolean mod = false;
-
-
+    public static int shortestDistance;
+    ArrayList<Object> listOfLists;
+    List<ArrayList<Object>> lakhra;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,13 +98,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         meanObject = new ArrayList<>();
 
         BestOnePath bestOnePath = new BestOnePath();
-        bestOnePath.readData(new BestOnePath.FirebaseCallback() {
-            @Override
-            public void onCallback(ArrayList<Object> list) {
-                    bestOnePath.getInfo(list);
-            }
-        });
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
@@ -141,7 +121,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 //--------------------------------Display map---------------------------------------
         mapFragment.getMapAsync(this);
-
 //----------------------------55------------------------------
         // Initialize Places.
         if (!Places.isInitialized()) {
@@ -167,12 +146,40 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // TODO: Get info about the selected place.
                 Toast.makeText(MainActivity.this, place.getLatLng() + place.getName() + " is your destination", Toast.LENGTH_SHORT).show();
 //              marker
-                if (destToClose.size() > 0) {
-                    destToClose.clear();
-                }
-                destToClose.add(place.getLatLng());
-//                LatLng center = new LatLng((lat+lat)/2)
-//                moveCameraToLocation(center, 15);
+                BestOnePath.distances.clear();
+                shortestDistance = Integer.MAX_VALUE;
+                lakhra = new ArrayList<>();
+
+                bestOnePath.readData(new BestOnePath.FirebaseCallback() {
+                    @Override
+                    public void onCallback(ArrayList<Object> list, long number) {
+                        listOfLists = new ArrayList<>(list);
+                        lakhra.add(listOfLists);
+                        Log.d(TAG, "list of lists "+listOfLists);
+                        Log.d(TAG, "lakhra "+lakhra);
+//                        iterator++;
+//                        requestPolyline();
+                        if (lakhra.size() == number ){
+                            if (locdest.size() > 0) {
+                                locdest.clear();
+                            }
+
+                            LatLng latLng2 = bestOnePath.castObjectToLatLng(lakhra.get(2).get(6));
+                            locdest.add(latLng2);
+                            LatLng latLng1 = bestOnePath.castObjectToLatLng(lakhra.get(2).get(4));
+                            List<String> ways= bestOnePath.castObjectToList(lakhra.get(2).get(7));
+
+                            new Handler().postDelayed(new Runnable(){
+                                @Override
+                                public void run() {
+
+                                    requestPolyline(latLng1,locdest,ways,"walking");
+                                }
+                            }, 500);
+
+                        }
+                    }
+                },latlngToString(place.getLatLng()));
             }
 
             @Override
@@ -182,9 +189,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 //        ----------
-        databaseReference = FirebaseDatabase.getInstance().getReference("features");
-//        ----------------------------- Waypoints creation
     }
+    //--------------------------------Enable Current Location--------------------------------
+    private void enableCurrentLocation() {
+        // Check if the device has location services enabled
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        // Enable the location layer on the map
+        mMap.setMyLocationEnabled(true);
+
+        // Get the last known location of the device
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    // Move the camera to the user's current location
+                    LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    moveCameraToLocation(currentLatLng, 15);
+                } else {
+                    Toast.makeText(MainActivity.this, "Unable to get current location", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
 
     //----------------------------On Place searched listener------------------------------
     @Override
@@ -264,164 +297,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return url;
     }
 
-//    //--------------------------------Request Direction URL--------------------------------
-//    public static String requestDirection(String reqUrl) throws Exception {
-//        String responseString = "";
-//        InputStream inputStream = null;
-//        HttpURLConnection httpURLConnection = null;
-//        try {
-//            URL url = new URL(reqUrl);
-//            httpURLConnection = (HttpURLConnection) url.openConnection();
-//            httpURLConnection.connect();
-//
-//            //Get the response result
-//            inputStream = httpURLConnection.getInputStream();
-//            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-//            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-//
-//            StringBuffer stringBuffer = new StringBuffer();
-//            String line = "";
-//            while ((line = bufferedReader.readLine()) != null) {
-//                stringBuffer.append(line);
-//            }
-//
-//            responseString = stringBuffer.toString();
-//            bufferedReader.close();
-//            inputStreamReader.close();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (inputStream != null) {
-//                inputStream.close();
-//            }
-//            httpURLConnection.disconnect();
-//        }
-////        System.out.println(responseString);
-//        return responseString;
-//    }
-//
-//    //--------------------------------55--------------------------------
-//    public static class TaskRequestDirections extends AsyncTask<String, Void, String> {
-//
-//        @Override
-//        protected String doInBackground(String... strings) {
-//            String responseString = "";
-//            try {
-//                responseString = requestDirection(strings[0]);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            return responseString;
-//
-//        }
-//
-//        @Override
-//        public void onPostExecute(String s) {
-//            super.onPostExecute(s);
-//            //Parse json here
-//            TaskParser taskParser = new TaskParser();
-//            taskParser.execute(s);
-//        }
-//    }
-//
-//    //-------------------------------55---------------------------------
-//    public static class TaskParser extends AsyncTask<String, Void, List<List<HashMap<String, String>>>> {
-//
-////        BestOnePath bestOnePath = new BestOnePath();
-//        @Override
-//        protected List<List<HashMap<String, String>>> doInBackground(String... strings) {
-//            JSONObject jsonObject = null;
-//            List<List<HashMap<String, String>>> routes = null;
-//            try {
-//                jsonObject = new JSONObject(strings[0]);
-//                meanObject.add(jsonObject);
-//                DirectionsParser directionsParser = new DirectionsParser();
-//                routes = directionsParser.parse(jsonObject);
-////                Log.d(TAG, "doInBackground::: "+directionsParser.getdisdur(jsonObject));
-////                Log.d(TAG, "doInBackground: "+meanObject);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//            return routes;
-//        }
-//
-//        @Override
-//        public void onPostExecute(List<List<HashMap<String, String>>> lists) {
-//            //Get list route and display it into the map
-//            ArrayList points = null;
-//            PolylineOptions polylineOptions = null;
-//
-//            for (List<HashMap<String, String>> path : lists) {
-//                points = new ArrayList();
-//                polylineOptions = new PolylineOptions();
-//
-//                for (HashMap<String, String> point : path) {
-//                    double lat = Double.parseDouble(point.get("lat"));
-//                    double lon = Double.parseDouble(point.get("lon"));
-//                    points.add(new LatLng(lat, lon));
-//                }
-//
-//                polylineOptions.addAll(points);
-//                polylineOptions.width(15f);
-//                polylineOptions.color(Color.argb(150, 252, 3, 36));
-//                polylineOptions.startCap(new RoundCap());
-//                polylineOptions.endCap(new RoundCap());
-//                polylineOptions.jointType(1);
-//                polylineOptions.geodesic(true);
-//                List<PatternItem> pattern;
-//                if (mod) {
-//                    pattern = Arrays.asList(new Dash(30));
-//                } else {
-//                    pattern = Arrays.asList(new Dot(), new Gap(30));
-//                    polylineOptions.color(Color.argb(150, 252, 3, 161));
-//                    polylineOptions.width(15f);
-//                    polylineOptions.pattern(pattern);
-//                }
-//            }
-//            if (polylineOptions != null) {
-////                mMap.addPolyline(polylineOptions);
-////                Log.d(TAG, "onPostExecute: n9ad norssm poly");
-//            } else {
-////                Toast.makeText(getApplicationContext(), "Direction not found!", Toast.LENGTH_SHORT).show();
-//                Log.d(TAG, "onPostExecute: ya babaaaa direction not found ");
-//            }
-//
-//        }
-//    }
 
-    //--------------------------------Enable Current Location--------------------------------
-    private void enableCurrentLocation() {
-        // Check if the device has location services enabled
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        // Enable the location layer on the map
-        mMap.setMyLocationEnabled(true);
-
-        // Get the last known location of the device
-        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if (location != null) {
-                    // Move the camera to the user's current location
-                    LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    moveCameraToLocation(currentLatLng, 15);
-                    if (locToClose.size() > 0) {
-                        locToClose.clear();
-                    }
-                    locToClose.add(currentLatLng);
-                    Log.d(TAG, "location is : " + currentLatLng);
-                } else {
-                    Toast.makeText(MainActivity.this, "Unable to get current location", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
 
     //--------------------------------Location Permission--------------------------------
     @Override
@@ -440,9 +316,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //--------------------------------Request a Polyline--------------------------------
-    public void requestPolyline(LatLng
-                                        latLng, ArrayList<LatLng> lol, List<String> wayppt, String mode) {
+    public void requestPolyline(LatLng latLng, ArrayList<LatLng> lol, List<String> wayppt, String mode) {
         mod = modeProvider(mode);
+        String drawTrue = String.valueOf(true);
         Log.d(TAG, "requestPolyline: mode is " + mod + "       " + mode);
         //Reset marker when already 2
         if (lol.size() == 2) {
@@ -468,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Create the URL to get request from first marker to second marker
             String url = getRequestUrl(lol.get(0), lol.get(1), wayppt);
             BestOnePath.TaskRequestDirections taskRequestDirections = new BestOnePath.TaskRequestDirections();
-            taskRequestDirections.execute(url);
+            taskRequestDirections.execute(url,"1",drawTrue);
         }
     }
 
@@ -478,46 +354,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             return false;
         else return true;
     }
-
-//            public boolean acumilatorDurationDistance (ArrayList < JSONObject > object) {
-//                int totalTram = 0;
-//                int totalH = 0;
-//                DirectionsParser directionsParser = new DirectionsParser();
-//                // Log.d(TAG, "doInBackground:::::::::::::::::::::::::::::: "+directionsParser.getdisdur(objectfortram.get(0))+"   "+directionsParser.getdisdur(objectfortram.get(1))+"    "+directionsParser.getdisdur(objectfortram.get(2)));
-//                try {
-//                    if (object.size() == 8) {
-//                        totalTram = directionsParser.getdisdur(object.get(0)).get(1) + directionsParser.getdisdur(object.get(2)).get(1) + (directionsParser.getdisdur(object.get(4)).get(1) + directionsParser.getdisdur(object.get(5)).get(1)) / 3;
-//                        totalH = directionsParser.getdisdur(object.get(1)).get(1) + directionsParser.getdisdur(object.get(3)).get(1) + (directionsParser.getdisdur(object.get(6)).get(1) + directionsParser.getdisdur(object.get(7)).get(1)) / 3;
-//                        Log.d(TAG, "acumilatorDurationDistance: for tramway " + totalTram);
-//                        Log.d(TAG, "acumilatorDurationDistance: for H bus " + totalH);
-//                    } else if (object.size() == 6) {
-//                        totalTram = directionsParser.getdisdur(object.get(0)).get(1) + directionsParser.getdisdur(object.get(2)).get(1) + directionsParser.getdisdur(object.get(4)).get(1) / 3;
-//                        totalH = directionsParser.getdisdur(object.get(1)).get(1) + directionsParser.getdisdur(object.get(3)).get(1) + directionsParser.getdisdur(object.get(5)).get(1) / 3;
-//                        Log.d(TAG, "acumilatorDurationDistance:::: for tramway " + totalTram);
-//                        Log.d(TAG, "acumilatorDurationDistance:::: for H bus " + totalH);
-//                    }
-//                    object.clear();
-//                } catch (Exception e) {
-//                    Toast.makeText(this, "click on the location button first", Toast.LENGTH_SHORT).show();
-//                    Log.d(TAG, "acumilatorDurationDistance: " + e);
-//                }
-//                return bestRoute(totalTram, totalH);
-//            }
-//
-//            //better option between tram and H
-//            public boolean bestRoute ( int totalt, int totalth){
-//                if (totalt <= totalth) {
-//                }
-//                    mMap.addPolyline(polylineOptionsTramW);
-//                    mMap.addPolyline(polylineOptionsTram);
-//                    mMap.addPolyline(ppTram);
-//                } else {
-//                    mMap.addPolyline(polylineOptionsHW);
-//                    mMap.addPolyline(polylineOptionsH);
-//                    mMap.addPolyline(ppH);
-//                }
-//                return totalt <= totalth;
-//            }
 
     //--------------------------------Move Camera/ Add Marker-------------------------------
     private void moveCameraToLocation(LatLng location, float zoom) {

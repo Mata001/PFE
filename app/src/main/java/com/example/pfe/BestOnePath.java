@@ -1,8 +1,5 @@
 package com.example.pfe;
 
-import static java.lang.Thread.onSpinWait;
-import static java.lang.Thread.sleep;
-
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -30,49 +27,45 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.BindException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 public class BestOnePath implements OnMapReadyCallback {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static String TAG = "info:";
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
     int i;
-    public static int number= 0;
+    public static int number = 0;
     int wpptNb;
     int SClosestIndex = 0;
     int EClosestIndex;
-    public static List<Integer> distances=new ArrayList<>();
-    public static ArrayList<JSONObject> meanObject=new ArrayList<>();
+    public static List<Integer> distances = new ArrayList<>();
+    public static ArrayList<JSONObject> meanObject = new ArrayList<>();
     List<String> waypoints = new ArrayList<>();
     List<String> waypoints1 = new ArrayList<>();
     List<String> waypoints2 = new ArrayList<>();
     List<String> wayppt = new ArrayList<>();
-
+    public static int shortestDistance = Integer.MAX_VALUE;
     List<List<String>> meanWaypoints = new ArrayList<>();
     //    static final ArrayList<Object> meanStations= new ArrayList<>();
     List<String> empty;
     static boolean mod = false;
-//    empty = new ArrayList<>();
-//    waypoints = new ArrayList<>();
-//    waypoints1 = new ArrayList<>();
-//    waypoints2 = new ArrayList<>();
-//    wayppt = new ArrayList<>();
+    public static ArrayList<Object> info = new ArrayList<>();
+    public static List<List<Object>> allInfo = new ArrayList<>();
+    public static ArrayList<Object> infoShortest = new ArrayList<>();
+
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
 
     }
 
-    public void readData(FirebaseCallback firebaseCallback) {
-        ArrayList<Object> info = new ArrayList<>();
+    public void readData(FirebaseCallback firebaseCallback, String destination) {
+//        ArrayList<Object> info = new ArrayList<>();
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -84,23 +77,15 @@ public class BestOnePath implements OnMapReadyCallback {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     number++;
                     ArrayList<String> destinations = new ArrayList<>();
+                    long meanNb = snapshot.getChildrenCount();
                     String meanName = dataSnapshot.getKey();
                     long end = snapshot.child(meanName).getChildrenCount();
-//                    destinations.clear();
                     for (i = start; i < end; i++) {
                         ModelTram modelTram = snapshot.child(meanName).child(Integer.toString(i)).getValue(ModelTram.class);
                         destinations.add(modelTram.getCoordinates());
-//                        LatLng test = new LatLng(35.704571, -0.588370);
-//                        LatLng latLng = MainActivity.castToLatLng(modelTram);
-//                    MarkerOptions markerOptions = new MarkerOptions();
-//                    markerOptions.position(test);
-//                            .title(modelTram.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.piner));
-//                    mMap.addMarker(markerOptions);
                     }
                     Log.d(TAG, "Mean :" + meanName + ", Number :" + end + ", Stations :" + destinations);
-//                    info.add(meanName);
-                    //Closest transport mean stations for destination
-                    ClosestPointFinder.findClosestPoint("35.705813,-0.527153", destinations, new ClosestPointFinder.DistanceCallback() {
+                    ClosestPointFinder.findClosestPoint("35.693350,-0.621150", destinations, new ClosestPointFinder.DistanceCallback() {
                         @Override
                         public void onDistanceReceived(int distance) {
                             Log.d(TAG, "distances dest " + distance);
@@ -114,17 +99,17 @@ public class BestOnePath implements OnMapReadyCallback {
                         @Override
                         public void onClosestPointReceived(String closestPoint) {
                             SClosestIndex = destinations.indexOf(closestPoint);
-//                            Log.d(TAG, "index ta Destination " + EClosestIndex);
-//                            Log.d(TAG, "Closest point to Destination for " + meanName + " is: " + closestPoint);
-//                            info.add(EClosestIndex);
+                            Log.d(TAG, "index ta Origin " + SClosestIndex);
                             info.clear();
+                            info.add("35.693350,-0.621150");
+                            info.add(destination);
                             info.add(meanName);
                             info.add(SClosestIndex);
                             info.add(closestPoint);
                         }
                     });
                     //Closest transport mean stations for origine
-                    ClosestPointFinder.findClosestPoint("35.627148,-0.598247", destinations, new ClosestPointFinder.DistanceCallback() {
+                    ClosestPointFinder.findClosestPoint(destination, destinations, new ClosestPointFinder.DistanceCallback() {
                         @Override
                         public void onDistanceReceived(int distance) {
                             Log.d(TAG, "distances origin " + distance);
@@ -139,46 +124,50 @@ public class BestOnePath implements OnMapReadyCallback {
 
                         @Override
                         public void onClosestPointReceived(String closestPoint) {
-
                             EClosestIndex = destinations.indexOf(closestPoint);
-//                            Log.d(TAG, "Index ta Origin " + SClosestIndex);
-//                            Log.d(TAG, "Closest point to Origin for " + meanName + " is: " + closestPoint);
-                            info.add(EClosestIndex);
-                            info.add(closestPoint);
-                            if (EClosestIndex > SClosestIndex) {
-                                wpptNb = EClosestIndex - SClosestIndex - 1;
-                                if (wpptNb < 26) {
-                                    waypoints = destinations.subList(SClosestIndex + 1, EClosestIndex);
-//                                    Log.d(TAG, "wahd " + waypoints);
-                                    info.add(waypoints);
-                                } else {
-                                    waypoints1 = destinations.subList(SClosestIndex + 1, SClosestIndex + 26);
-                                    waypoints2 = destinations.subList(SClosestIndex + 27, EClosestIndex);
-//                                    Log.d(TAG, "lowl " + waypoints1);
-//                                    Log.d(TAG, "tani " + waypoints2);
-                                    info.add(waypoints1);
-                                    info.add(destinations.get(SClosestIndex + 26));
-                                    info.add(waypoints2);
-                                }
-                                firebaseCallback.onCallback(info);
-
-                            } else {
+                            Log.d(TAG, "Index ta Destination " + EClosestIndex);
+                            if (EClosestIndex == SClosestIndex) {
+                                Log.d(TAG, "dir directions direct a lhaj");
+                                getInfo(info);
+                                firebaseCallback.onCallback(info, meanNb);
+                            } else if (EClosestIndex != SClosestIndex) {
                                 wpptNb = -EClosestIndex + SClosestIndex - 1;
-                                if (wpptNb < 26) {
-                                    waypoints = destinations.subList(EClosestIndex + 1, SClosestIndex - 1);
-                                    Log.d(TAG, "wahd " + waypoints);
-                                    info.add(waypoints);
-                                } else {
-                                    waypoints1 = destinations.subList(EClosestIndex + 1, EClosestIndex + 26);
-                                    waypoints2 = destinations.subList(EClosestIndex + 27, SClosestIndex);
-//                                    Log.d(TAG, "lowl " + waypoints1);
-//                                    Log.d(TAG, "tani " + waypoints2);
-                                    info.add(waypoints1);
-                                    info.add(destinations.get(EClosestIndex + 26));
-                                    info.add(waypoints2);
+                                info.add(EClosestIndex);
+                                info.add(closestPoint);
+                                if (EClosestIndex > SClosestIndex) {
+                                    if (wpptNb < 26) {
+                                        waypoints = destinations.subList(SClosestIndex + 1, EClosestIndex);
+                                        Log.d(TAG, "wahd " + waypoints);
+                                        info.add(waypoints);
+                                    } else if (wpptNb > 25) {
+                                        waypoints1 = destinations.subList(SClosestIndex + 1, SClosestIndex + 26);
+                                        waypoints2 = destinations.subList(SClosestIndex + 27, EClosestIndex);
+                                        Log.d(TAG, "lowl " + waypoints1);
+                                        Log.d(TAG, "tani " + waypoints2);
+                                        info.add(waypoints1);
+                                        info.add(destinations.get(SClosestIndex + 26));
+                                        info.add(waypoints2);
+                                    }
+                                    getInfo(info);
+                                    firebaseCallback.onCallback(info, meanNb);
 
+                                } else if (SClosestIndex > EClosestIndex) {
+                                    if (wpptNb < 26) {
+                                        waypoints = destinations.subList(EClosestIndex + 1, SClosestIndex - 1);
+                                        Log.d(TAG, "wahd " + waypoints);
+                                        info.add(waypoints);
+                                    } else if (wpptNb > 25) {
+                                        waypoints1 = destinations.subList(EClosestIndex + 1, EClosestIndex + 26);
+                                        waypoints2 = destinations.subList(EClosestIndex + 27, SClosestIndex);
+                                        Log.d(TAG, "lowl " + waypoints1);
+                                        Log.d(TAG, "tani " + waypoints2);
+                                        info.add(waypoints1);
+                                        info.add(destinations.get(EClosestIndex + 26));
+                                        info.add(waypoints2);
+                                    }
+                                    getInfo(info);
+                                    firebaseCallback.onCallback(info, meanNb);
                                 }
-                                firebaseCallback.onCallback(info);
                             }
                         }
                     });
@@ -193,43 +182,50 @@ public class BestOnePath implements OnMapReadyCallback {
     }
 
     public interface FirebaseCallback {
-        void onCallback(ArrayList<Object> list);
+        void onCallback(ArrayList<Object> list, long number);
     }
 
     public void getInfo(ArrayList<Object> lista) {
-        List<String> urls=new ArrayList<>();
+        List<String> urls = new ArrayList<>();
         List<String> khawi = new ArrayList<>();
         Log.d(TAG, "karitha siyed mn " + lista);
-        String originUrl = MainActivity.getRequestUrl(new LatLng(35.693351, -0.589981), castObjectToLatLng(lista.get(2)), khawi);
-        String destinationUrl = MainActivity.getRequestUrl(new LatLng(35.627148, -0.598247), castObjectToLatLng(lista.get(4)), khawi);
 
-        urls.add(originUrl);
-        urls.add(destinationUrl);
-        if (lista.size() == 6) {
-            String url = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(2)), castObjectToLatLng(lista.get(4)), castObjectToList(lista.get(5)));
-            Log.d(TAG, "urls ta direction ki maykounch chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url);
-            urls.add(url);
+        if (lista.size() == 5) {
+            Log.d(TAG, " mat7tajch transport ");
+            String urldirect = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(0)), castObjectToLatLng(lista.get(1)), khawi);
+            urls.add(urldirect);
+        } else if (lista.size() != 5) {
+            String originUrl = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(0)), castObjectToLatLng(lista.get(4)), khawi);
+            String destinationUrl = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(1)), castObjectToLatLng(lista.get(6)), khawi);
+            urls.add(originUrl);
+            urls.add(destinationUrl);
+            if (lista.size() == 8) {
+                String url = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(4)), castObjectToLatLng(lista.get(6)), castObjectToList(lista.get(7)));
+                Log.d(TAG, "urls ta direction ki maykounch chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url);
+                urls.add(url);
 
-        } else if (lista.size() == 8) {
-            String url1 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(2)), castObjectToLatLng(lista.get(6)), castObjectToList(lista.get(5)));
-            String url2 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(6)), castObjectToLatLng(lista.get(4)), castObjectToList(lista.get(7)));
-            Log.d(TAG, "urls ta direction ki ykoun chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url1 + "\n" + url2);
-            urls.add(url1);
-            urls.add(url2);
+            } else if (lista.size() == 10) {
+                String url1 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(4)), castObjectToLatLng(lista.get(8)), castObjectToList(lista.get(7)));
+                String url2 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(8)), castObjectToLatLng(lista.get(6)), castObjectToList(lista.get(9)));
+                Log.d(TAG, "urls ta direction ki ykoun chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url1 + "\n" + url2);
+                urls.add(url1);
+                urls.add(url2);
 
+            }
         } else {
             Log.d(TAG, "ak ghalt sa7bi me ttali ");
         }
 //        MainActivity.TaskParser taskParser = new MainActivity.TaskParser();
-        String urlsNb=String.valueOf(urls.size());
+        String urlsNb = String.valueOf(urls.size());
+        String drawFalse = String.valueOf(false);
 //        int urlsNb urls.size();
 //        Log.d(TAG, "getInfo: ");
-        for (String pieceUrl : urls){
+        for (String pieceUrl : urls) {
             TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
-            taskRequestDirections.execute(pieceUrl,urlsNb);
+            taskRequestDirections.execute(pieceUrl, urlsNb, drawFalse);
 //            Log.d(TAG, "getInfo: "+ mainActivity.meanObject);
         }
-        Log.d(TAG, "faslaaa "+urls);
+        Log.d(TAG, "faslaaa " + urls);
     }
 
     public LatLng castObjectToLatLng(Object object) {
@@ -247,16 +243,22 @@ public class BestOnePath implements OnMapReadyCallback {
         return waypointsList;
     }
 
-    public static int acumilatorDurationDistance(ArrayList<JSONObject> object){
+    public static int acumilatorDurationDistance(ArrayList<JSONObject> object) {
         DirectionsParser directionsParser = new DirectionsParser();
-        int total=0;
+        int total = 0;
         try {
             if (object.size() == 4) {
                 total = directionsParser.getdisdur(object.get(0)).get(1) + directionsParser.getdisdur(object.get(1)).get(1) + (directionsParser.getdisdur(object.get(2)).get(1) + directionsParser.getdisdur(object.get(3)).get(1)) / 3;
+                info.add(total);
+                Log.d(TAG, "total ta 4 " + total);
             } else if (object.size() == 3) {
                 total = directionsParser.getdisdur(object.get(0)).get(1) + directionsParser.getdisdur(object.get(1)).get(1) + directionsParser.getdisdur(object.get(2)).get(1) / 3;
-            }
-            else if (object.size() ==7){
+
+                Log.d(TAG, "total ta 3 " + total);
+            } else if (object.size() == 1) {
+                total = directionsParser.getdisdur(object.get(0)).get(1);
+                Log.d(TAG, "total ta direct");
+            } else if (object.size() == 7) {
                 directionsParser.getdisdur(object.get(4)).get(1);
                 directionsParser.getdisdur(object.get(5)).get(1);
                 directionsParser.getdisdur(object.get(6)).get(1);
@@ -266,6 +268,7 @@ public class BestOnePath implements OnMapReadyCallback {
 //            Toast.makeText(this, "click on the location button first", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "acumilatorDurationDistance: " + e);
         }
+//        Log.d(TAG, "distance total "+total);
         return total;
     }
 
@@ -310,11 +313,14 @@ public class BestOnePath implements OnMapReadyCallback {
     //--------------------------------55--------------------------------
     public static class TaskRequestDirections extends AsyncTask<String, Void, String> {
         String urlsNb;
+        String draw;
+
         @Override
         protected String doInBackground(String... strings) {
             String responseString = "";
             try {
                 urlsNb = strings[1];
+                draw = strings[2];
                 responseString = requestDirection(strings[0]);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -328,18 +334,21 @@ public class BestOnePath implements OnMapReadyCallback {
             super.onPostExecute(s);
             //Parse json here
             TaskParser taskParser = new TaskParser();
-            taskParser.execute(s,urlsNb);
+            taskParser.execute(s, urlsNb, draw);
         }
     }
 
     //-------------------------------55---------------------------------
     public static class TaskParser extends AsyncTask<String, Void, List<List<HashMap<String, String>>>> {
         String urlsNb;
+        String draw;
+
         @Override
         protected List<List<HashMap<String, String>>> doInBackground(String... strings) {
             JSONObject jsonObject = null;
             List<List<HashMap<String, String>>> routes = null;
-            urlsNb= strings[1];
+            urlsNb = strings[1];
+            draw = strings[2];
             try {
                 jsonObject = new JSONObject(strings[0]);
                 meanObject.add(jsonObject);
@@ -357,72 +366,89 @@ public class BestOnePath implements OnMapReadyCallback {
 
         @Override
         public void onPostExecute(List<List<HashMap<String, String>>> lists) {
+            int Nb = Integer.valueOf(urlsNb);
 
-            int Nb= Integer.valueOf(urlsNb);
-//            Log.d(TAG, "onPostExecute mean "+Nb);
-            if (meanObject.size()==Nb){
-                distances.add(acumilatorDurationDistance(meanObject));
-                meanObject.clear();
-//                Log.d(TAG, " belekeeee 3");
-                Log.d(TAG, "distances   "+distances);
-            }
-            if (distances.size()==number){
-            bestMean(distances);
-            }
             //Get list route and display it into the map
-            ArrayList points = null;
-            PolylineOptions polylineOptions = null;
+            if (draw == "true") {
 
-            for (List<HashMap<String, String>> path : lists) {
-                points = new ArrayList();
-                polylineOptions = new PolylineOptions();
+                Log.d(TAG, "test true "+distances.indexOf(MainActivity.shortestDistance));
+                ArrayList points = null;
+                PolylineOptions polylineOptions = null;
+                for (List<HashMap<String, String>> path : lists) {
+                    points = new ArrayList();
+                    polylineOptions = new PolylineOptions();
+                    for (HashMap<String, String> point : path) {
+                        double lat = Double.parseDouble(point.get("lat"));
+                        double lon = Double.parseDouble(point.get("lon"));
+                        points.add(new LatLng(lat, lon));
+                    }
 
-                for (HashMap<String, String> point : path) {
-                    double lat = Double.parseDouble(point.get("lat"));
-                    double lon = Double.parseDouble(point.get("lon"));
-                    points.add(new LatLng(lat, lon));
-                }
-
-                polylineOptions.addAll(points);
-                polylineOptions.width(15f);
-                polylineOptions.color(Color.argb(150, 252, 3, 36));
-                polylineOptions.startCap(new RoundCap());
-                polylineOptions.endCap(new RoundCap());
-                polylineOptions.jointType(1);
-                polylineOptions.geodesic(true);
-                List<PatternItem> pattern;
-                if (mod) {
-                    pattern = Arrays.asList(new Dash(30));
-                } else {
-                    pattern = Arrays.asList(new Dot(), new Gap(30));
-                    polylineOptions.color(Color.argb(150, 252, 3, 161));
+                    polylineOptions.addAll(points);
                     polylineOptions.width(15f);
-                    polylineOptions.pattern(pattern);
+                    polylineOptions.color(Color.argb(150, 252, 3, 36));
+                    polylineOptions.startCap(new RoundCap());
+                    polylineOptions.endCap(new RoundCap());
+                    polylineOptions.jointType(1);
+                    polylineOptions.geodesic(true);
+                    List<PatternItem> pattern;
+                    if (mod) {
+                        pattern = Arrays.asList(new Dash(30));
+                    } else {
+                        pattern = Arrays.asList(new Dot(), new Gap(30));
+                        polylineOptions.color(Color.argb(150, 252, 3, 161));
+                        polylineOptions.width(15f);
+                        polylineOptions.pattern(pattern);
+                    }
                 }
-            }
-            if (polylineOptions != null) {
-//                mMap.addPolyline(polylineOptions);
-//                Log.d(TAG, "onPostExecute: n9ad norssm poly");
-            } else {
+                if (polylineOptions != null) {
+                    MainActivity.mMap.addPolyline(polylineOptions);
+                    Log.d(TAG, "onPostExecute: n9ad norssm poly");
+
+                } else {
 //                Toast.makeText(getApplicationContext(), "Direction not found!", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "onPostExecute: ya babaaaa direction not found ");
+                    Log.d(TAG, "onPostExecute: ya babaaaa direction not found ");
+                }
+            }else {
+                if (meanObject.size() == Nb) {
+                    int distanceReturned = acumilatorDurationDistance(meanObject);
+                    meanObject.clear();
+                    distances.add(distanceReturned);
+                    if (distanceReturned <= MainActivity.shortestDistance) {
+                        MainActivity.shortestDistance = distanceReturned;
+                        Log.d(TAG, "shortest distance is " + MainActivity.shortestDistance);
+                        Log.d(TAG, "index ta shortest distance is " + distances.indexOf(MainActivity.shortestDistance));
+
+                    } else {
+                        Log.d(TAG, "shortest aw 9bl wla aw jay ");
+                    }
+                    Log.d(TAG, "index ta shortest distance is " + distances.indexOf(MainActivity.shortestDistance));
+
+                }
+//                Log.d(TAG, "results brk ");
+
             }
 //            return meanObject;
         }
+
     }
-    public static void bestMean(List<Integer> list){
-        int min = Integer.MAX_VALUE;
-        int p ;
-        int index = 0;
-//        if (list.size() == number ){
-//        Collections.sort(list);
-            for (p = 0 ; p<list.size();p++){
-                if (list.get(p)<min){
-                    min = list.get(p);
-                    index= p;
-                }
-            }
-            Log.d(TAG, "bestMean: "+min +" its index "+index);
+
+//    public static void bestMean(FirebaseCallback firebaseCallback ) {
+//        if (meanObject.size() == Nb) {
+//            int distanceReturned = acumilatorDurationDistance(meanObject);
+//            meanObject.clear();
+//            distances.add(distanceReturned);
+//            if (distanceReturned <= MainActivity.shortestDistance){
+//                MainActivity.shortestDistance = distanceReturned;
+////                    index = iterator;
+//                Log.d(TAG, "shortest distance is "+MainActivity.shortestDistance);
+//                Log.d(TAG, "index ta shortest distance is "+distances.indexOf(MainActivity.shortestDistance));
+//            }
+//            else {
+//                iterator++;
+//                Log.d(TAG, "shortest aw 9bl wla aw jay ");
+//            }
+//            Log.d(TAG, "index ta shortest distance is "+distances.indexOf(MainActivity.shortestDistance));
+//
 //        }
-    }
+//    }
 }
