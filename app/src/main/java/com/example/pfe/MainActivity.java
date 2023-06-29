@@ -13,7 +13,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-
+import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -79,9 +79,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ArrayList<Object> listOfLists;
     List<ArrayList<Object>> lakhra;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         listPoints = new ArrayList<>();
         locdest = new ArrayList<>();

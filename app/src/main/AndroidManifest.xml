@@ -35,6 +35,10 @@
             android:name=".Page2"
             android:exported="false" />
         <activity
+            android:name=".UserGuideActivity"
+            android:label="User Guide"
+            android:exported="true"/>
+        <activity
             android:name=".SplashScreen"
             android:exported="true">
             <intent-filter>
