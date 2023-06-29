@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
+        FloatingActionButton userGuideBtn = findViewById(R.id.userGuide);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
@@ -122,6 +123,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                enableCurrentLocation();
                 mMap.clear();
                 moveCameraToLocation(new LatLng(35.665618,-0.634003), 15);
+            }
+        });
+        //-----------------------------userguide -------------------------------------
+        userGuideBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, UserGuideActivityForbutton.class);
+                startActivity(intent);
             }
         });
 //--------------------------------Display map---------------------------------------

@@ -37,7 +37,9 @@
         <activity
             android:name=".UserGuideActivity"
             android:label="User Guide"
-            android:exported="true"/>
+            android:exported="false"/>
+        <activity android:name=".UserGuideActivityForbutton"
+            android:exported="false"/>
         <activity
             android:name=".SplashScreen"
             android:exported="true">
