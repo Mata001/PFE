@@ -73,11 +73,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ArrayList<LatLng> locdest;
     ArrayList<LatLng> locdest1;
     ArrayList<LatLng> locdest2;
-    public static ArrayList<JSONObject> meanObject;
+//    public static ArrayList<JSONObject> meanObject;
     static boolean mod = false;
     public static int shortestDistance;
+    public static int shortestDistanceIndex;
+
     ArrayList<Object> listOfLists;
-    List<ArrayList<Object>> lakhra;
+    public static List<ArrayList<Object>> lakhra;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         waypoints1 = new ArrayList<>();
         waypoints2 = new ArrayList<>();
         wayppt = new ArrayList<>();
-        meanObject = new ArrayList<>();
+//        meanObject = new ArrayList<>();
 
         BestOnePath bestOnePath = new BestOnePath();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -115,8 +117,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         currentLocationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                enableCurrentLocation();
+//                enableCurrentLocation();
                 mMap.clear();
+                moveCameraToLocation(new LatLng(35.665618,-0.634003), 15);
             }
         });
 //--------------------------------Display map---------------------------------------
@@ -148,17 +151,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //              marker
                 BestOnePath.distances.clear();
                 shortestDistance = Integer.MAX_VALUE;
+                shortestDistanceIndex=-1;
                 lakhra = new ArrayList<>();
                 BestOnePath.polylineNumbers.clear();
                 BestOnePath.polylineOptionsArrayList.clear();
                 mMap.clear();
+                Log.d(TAG, "Aya allah yrb7 "+BestOnePath.distances+"    " +shortestDistance);
 
                 bestOnePath.readData(new BestOnePath.FirebaseCallback() {
                     @Override
                     public void onCallback(ArrayList<Object> list, long number) {
+                        listOfLists = new ArrayList<>();
+                        listOfLists = (ArrayList<Object>)list.clone();
+                        lakhra.add(listOfLists);
+                        if (lakhra.size()==number){
+                            Log.d(TAG, "lakra fel meathod "+lakhra.get(1));
+                        }
                     }
-                },latlngToString(place.getLatLng()),latlngToString(locdest1.get(0)));
+                },latlngToString(place.getLatLng()),"35.665618,-0.634003");
+
 //                latlngToString(locdest1.get(0))
+//                ecole :35.665618,-0.634003
             }
 
 
@@ -190,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (location != null) {
                     // Move the camera to the user's current location
                     LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    moveCameraToLocation(currentLatLng, 15);
+                    moveCameraToLocation(new LatLng(35.665618,-0.634003), 15);
                     locdest1.clear();
                     locdest1.add(currentLatLng);
                 } else {
@@ -257,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //--------------------------------Create Direction URL--------------------------------
-    public static String getRequestUrl(LatLng origin, LatLng dest, List<String> wayppt) {
+    public static String getRequestUrl(LatLng origin, LatLng dest, List<String> wayppt, String mode) {
         String waypointsString = TextUtils.join("|via:", wayppt);
         //Value of origin
         String str_org = "origin=" + origin.latitude + "," + origin.longitude;
@@ -268,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Set waypoints those are the bus stations
         String way = "waypoints=" + waypointsString;
         //Mode for find direction
-        String mod = "mode=walking";
+        String mod = "mode="+mode;
         //String key for api key
         String key = "key=AIzaSyARlcOfXAA-JfGWFW6VH8AbtQbI96qjj6I";
         //Build the full param
@@ -324,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (lol.size() == 2) {
             //Create the URL to get request from first marker to second marker
-            String url = getRequestUrl(lol.get(0), lol.get(1), wayppt);
+            String url = getRequestUrl(lol.get(0), lol.get(1), wayppt,"driving");
             BestOnePath.TaskRequestDirections taskRequestDirections = new BestOnePath.TaskRequestDirections();
             taskRequestDirections.execute(url,"1");
         }

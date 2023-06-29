@@ -49,7 +49,6 @@ public class BestOnePath implements OnMapReadyCallback {
     List<String> waypoints1 = new ArrayList<>();
     List<String> waypoints2 = new ArrayList<>();
     List<String> wayppt = new ArrayList<>();
-    public static int shortestDistance = Integer.MAX_VALUE;
     List<List<String>> meanWaypoints = new ArrayList<>();
     //    static final ArrayList<Object> meanStations= new ArrayList<>();
     List<String> empty;
@@ -64,8 +63,8 @@ public class BestOnePath implements OnMapReadyCallback {
 
     }
 
-    public void readData(FirebaseCallback firebaseCallback, String destination,String origin) {
-        Log.d(TAG, "origin "+origin);
+    public void readData(FirebaseCallback firebaseCallback, String destination, String origin) {
+        Log.d(TAG, "origin " + origin);
 //        ArrayList<Object> info = new ArrayList<>();
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -193,41 +192,86 @@ public class BestOnePath implements OnMapReadyCallback {
         List<String> khawi = new ArrayList<>();
         Log.d(TAG, "karitha siyed mn " + lista);
 
-        if (lista.size() == 5) {
-            Log.d(TAG, " mat7tajch transport ");
-            String urldirect = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(0)), castObjectToLatLng(lista.get(1)), khawi);
-            urls.add(urldirect);
-        } else if (lista.size() != 5) {
-            String originUrl = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(0)), castObjectToLatLng(lista.get(4)), khawi);
-            String destinationUrl = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(1)), castObjectToLatLng(lista.get(6)), khawi);
-            urls.add(originUrl);
-            urls.add(destinationUrl);
-            if (lista.size() == 8) {
-                String url = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(4)), castObjectToLatLng(lista.get(6)), castObjectToList(lista.get(7)));
-                Log.d(TAG, "urls ta direction ki maykounch chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url);
-                urls.add(url);
+        if (lista.get(2).toString().equals("B") || lista.get(2).toString().equals("H")) {
+            Log.d(TAG, "wchmn mean transport " + lista.get(2));
+            if (lista.size() == 5) {
+                Log.d(TAG, " mat7tajch transport ");
+                String urldirect = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(0)), castObjectToLatLng(lista.get(1)), khawi, "walking");
+                urls.add(urldirect);
+            } else if (lista.size() != 5) {
+                String originUrl = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(0)), castObjectToLatLng(lista.get(4)), khawi, "walking");
+                String destinationUrl = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(1)), castObjectToLatLng(lista.get(6)), khawi, "walking");
+                urls.add(originUrl);
+                urls.add(destinationUrl);
+                if (lista.size() == 8) {
+                    String url = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(4)), castObjectToLatLng(lista.get(6)), castObjectToList(lista.get(7)), "driving");
+                    Log.d(TAG, "urls ta direction ki maykounch chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url);
+                    urls.add(url);
 
-            } else if (lista.size() == 10) {
-                String url1 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(4)), castObjectToLatLng(lista.get(8)), castObjectToList(lista.get(7)));
-                String url2 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(8)), castObjectToLatLng(lista.get(6)), castObjectToList(lista.get(9)));
-                Log.d(TAG, "urls ta direction ki ykoun chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url1 + "\n" + url2);
-                urls.add(url1);
-                urls.add(url2);
+                } else if (lista.size() == 10) {
+                    String url1 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(4)), castObjectToLatLng(lista.get(8)), castObjectToList(lista.get(7)), "driving");
+                    String url2 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(8)), castObjectToLatLng(lista.get(6)), castObjectToList(lista.get(9)), "driving");
+                    Log.d(TAG, "urls ta direction ki ykoun chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url1 + "\n" + url2);
+                    urls.add(url1);
+                    urls.add(url2);
 
+                }
+            } else {
+                Log.d(TAG, "ak ghalt sa7bi me ttali ");
             }
-        } else {
-            Log.d(TAG, "ak ghalt sa7bi me ttali ");
+        } else if (lista.get(2).toString().equals("Tramway")) {
+            Log.d(TAG, "moyen de transport tram " + lista.get(2));
+            if (lista.size() == 5) {
+                Log.d(TAG, " mat7tajch transport ");
+                String urldirect = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(0)), castObjectToLatLng(lista.get(1)), khawi, "walking");
+                urls.add(urldirect);
+            } else if (lista.size() != 5) {
+                String originUrl = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(0)), castObjectToLatLng(lista.get(4)), khawi, "walking");
+                String destinationUrl = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(1)), castObjectToLatLng(lista.get(6)), khawi, "walking");
+                urls.add(originUrl);
+                urls.add(destinationUrl);
+                if (lista.size() == 8) {
+                    String url = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(4)), castObjectToLatLng(lista.get(6)), castObjectToList(lista.get(7)), "walking");
+                    Log.d(TAG, "urls ta direction ki maykounch chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url);
+                    urls.add(url);
+
+                } else if (lista.size() == 10) {
+                    String url1 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(4)), castObjectToLatLng(lista.get(8)), castObjectToList(lista.get(7)), "walking");
+                    String url2 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(8)), castObjectToLatLng(lista.get(6)), castObjectToList(lista.get(9)), "walking");
+                    Log.d(TAG, "urls ta direction ki ykoun chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url1 + "\n" + url2);
+                    urls.add(url1);
+                    urls.add(url2);
+
+                }
+            } else {
+                Log.d(TAG, "ak ghalt sa7bi me ttali ");
+            }
+
         }
 //        MainActivity.TaskParser taskParser = new MainActivity.TaskParser();
         String urlsNb = String.valueOf(urls.size());
         polylineNumbers.add(urls.size());
 //        int urlsNb urls.size();
 //        Log.d(TAG, "getInfo: ");
-        for (String pieceUrl : urls) {
+
+        for (String pieceUrl : urls.subList(0, 2)) {
             TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
-            taskRequestDirections.execute(pieceUrl, urlsNb);
-//            Log.d(TAG, "getInfo: "+ mainActivity.meanObject);
+//            for (int l=0 ;l< 2;l++){
+            taskRequestDirections.execute(pieceUrl, urlsNb, "walking");
+//            }
+//            for (int l=2 ;l<urls.size();l++){
+//                taskRequestDirections.execute(pieceUrl, urlsNb, "driving");
+//            }
+////            TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
+////            taskRequestDirections.execute(pieceUrl, urlsNb);
+////            Log.d(TAG, "getInfo: "+ mainActivity.meanObject);
         }
+        for (String pieceUrl : urls.subList(2, urls.size())) {
+
+            TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
+            taskRequestDirections.execute(pieceUrl, urlsNb, "driving");
+        }
+
         Log.d(TAG, "faslaaa " + urls);
     }
 
@@ -249,14 +293,13 @@ public class BestOnePath implements OnMapReadyCallback {
     public static int acumilatorDurationDistance(ArrayList<JSONObject> object) {
         DirectionsParser directionsParser = new DirectionsParser();
         int total = 0;
+        Log.d(TAG, "meeeee " + MainActivity.lakhra);
         try {
             if (object.size() == 4) {
                 total = directionsParser.getdisdur(object.get(0)).get(1) + directionsParser.getdisdur(object.get(1)).get(1) + (directionsParser.getdisdur(object.get(2)).get(1) + directionsParser.getdisdur(object.get(3)).get(1)) / 3;
-                info.add(total);
                 Log.d(TAG, "total ta 4 " + total);
             } else if (object.size() == 3) {
                 total = directionsParser.getdisdur(object.get(0)).get(1) + directionsParser.getdisdur(object.get(1)).get(1) + directionsParser.getdisdur(object.get(2)).get(1) / 3;
-
                 Log.d(TAG, "total ta 3 " + total);
             } else if (object.size() == 1) {
                 total = directionsParser.getdisdur(object.get(0)).get(1);
@@ -316,6 +359,7 @@ public class BestOnePath implements OnMapReadyCallback {
     //--------------------------------55--------------------------------
     public static class TaskRequestDirections extends AsyncTask<String, Void, String> {
         String urlsNb;
+        String mode;
 
 
         @Override
@@ -323,6 +367,7 @@ public class BestOnePath implements OnMapReadyCallback {
             String responseString = "";
             try {
                 urlsNb = strings[1];
+                mode = strings[2];
                 responseString = requestDirection(strings[0]);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -336,20 +381,21 @@ public class BestOnePath implements OnMapReadyCallback {
             super.onPostExecute(s);
             //Parse json here
             TaskParser taskParser = new TaskParser();
-            taskParser.execute(s, urlsNb);
+            taskParser.execute(s, urlsNb, mode);
         }
     }
 
     //-------------------------------55---------------------------------
     public static class TaskParser extends AsyncTask<String, Void, List<List<HashMap<String, String>>>> {
         String urlsNb;
-
+        String mode;
 
         @Override
         protected List<List<HashMap<String, String>>> doInBackground(String... strings) {
             JSONObject jsonObject = null;
             List<List<HashMap<String, String>>> routes = null;
             urlsNb = strings[1];
+            mode = strings[2];
             try {
                 jsonObject = new JSONObject(strings[0]);
                 meanObject.add(jsonObject);
@@ -369,117 +415,109 @@ public class BestOnePath implements OnMapReadyCallback {
         public void onPostExecute(List<List<HashMap<String, String>>> lists) {
             int Nb = Integer.valueOf(urlsNb);
             int totalNbPoly = 0;
-            int startIndex=0;
+            int startIndex = 0;
 //            polylineNumbers.add(Nb);
 //            int totalNbPoly = Arrays.stream(polylineNumbers).sum();
-            for (int n=0 ; n<polylineNumbers.size();n++){
+            for (int n = 0; n < polylineNumbers.size(); n++) {
                 totalNbPoly += polylineNumbers.get(n);
             }
-            Log.d(TAG, "total Nb "+totalNbPoly);
+            Log.d(TAG, "total Nb " + totalNbPoly);
 
-
-
-            //Get list route and display it into the map
             if (meanObject.size() == Nb) {
+//                Log.d(TAG, "info list " + MainActivity.lakhra);
                 int distanceReturned = acumilatorDurationDistance(meanObject);
-                meanObject.clear();
+                Log.d(TAG, "distanceReturned " + distanceReturned);
                 distances.add(distanceReturned);
-                if (distanceReturned <= MainActivity.shortestDistance) {
+                meanObject.clear();
+                Log.d(TAG, "distances " + distances);
+                if (distanceReturned < MainActivity.shortestDistance) {
                     MainActivity.shortestDistance = distanceReturned;
+                    MainActivity.shortestDistanceIndex = distances.indexOf(MainActivity.shortestDistance);
                     Log.d(TAG, "shortest distance is " + MainActivity.shortestDistance);
                     Log.d(TAG, "index ta shortest distance is " + distances.indexOf(MainActivity.shortestDistance));
+                    Log.d(TAG, "index ta shortest distance is " + MainActivity.shortestDistanceIndex);
 
                 } else {
                     Log.d(TAG, "shortest aw 9bl wla aw jay ");
                 }
-                Log.d(TAG, "index ta shortest distance is " + distances.indexOf(MainActivity.shortestDistance));
+                Log.d(TAG, "index ta shortest distance is  222" + MainActivity.shortestDistanceIndex);
 //                Log.d(TAG, "lisssssst polyyyys "+polylineOptionsArrayList);
+            }else{
+                Log.d(TAG, "rah kayn decalage fel mean Object addition ");
             }
-
-                ArrayList points = null;
-                PolylineOptions polylineOptions = null;
-                for (List<HashMap<String, String>> path : lists) {
-                    points = new ArrayList();
-                    polylineOptions = new PolylineOptions();
-                    for (HashMap<String, String> point : path) {
-                        double lat = Double.parseDouble(point.get("lat"));
-                        double lon = Double.parseDouble(point.get("lon"));
-                        points.add(new LatLng(lat, lon));
-                    }
-
-                    polylineOptions.addAll(points);
-                    polylineOptions.width(15f);
-                    polylineOptions.color(Color.argb(150, 252, 3, 36));
-                    polylineOptions.startCap(new RoundCap());
-                    polylineOptions.endCap(new RoundCap());
-                    polylineOptions.jointType(1);
-                    polylineOptions.geodesic(true);
-                    List<PatternItem> pattern;
-//                    if (mod) {
-                        pattern = Arrays.asList(new Dash(30));
-//                    } else {
-//                        pattern = Arrays.asList(new Dot(), new Gap(30));
-//                        polylineOptions.color(Color.argb(150, 252, 3, 161));
-//                        polylineOptions.width(15f);
-//                        polylineOptions.pattern(pattern);
-//                    }
+            ArrayList points = null;
+            PolylineOptions polylineOptions = null;
+            for (List<HashMap<String, String>> path : lists) {
+                points = new ArrayList();
+                polylineOptions = new PolylineOptions();
+                for (HashMap<String, String> point : path) {
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lon = Double.parseDouble(point.get("lon"));
+                    points.add(new LatLng(lat, lon));
                 }
-                if (polylineOptions != null) {
 
+                polylineOptions.addAll(points);
+                polylineOptions.width(15f);
+                polylineOptions.color(Color.argb(200, 252, 3, 36));
+                polylineOptions.startCap(new RoundCap());
+                polylineOptions.endCap(new RoundCap());
+                polylineOptions.jointType(1);
+                polylineOptions.geodesic(true);
+                List<PatternItem> pattern;
+                if (mode == "driving") {
+                    pattern = Arrays.asList(new Dash(30));
+                } else if (mode == "walking") {
+                    pattern = Arrays.asList(new Dot(), new Gap(30));
+                    polylineOptions.color(Color.argb(200, 110, 0, 15));
+                    polylineOptions.width(15f);
+                    polylineOptions.pattern(pattern);
+                }
+            }
+            if (polylineOptions != null) {
 //                    MainActivity.mMap.addPolyline(polylineOptions);
-                    polylineOptionsArrayList.add(polylineOptions);
-                    if (polylineOptionsArrayList.size()  == totalNbPoly){
-                        for (int i = 0; i< distances.indexOf(MainActivity.shortestDistance); i++){
-                            Log.d(TAG, "indexx "+distances.indexOf(MainActivity.shortestDistance));
-                            Log.d(TAG, "polynumbers "+polylineNumbers);
-                            startIndex+=polylineNumbers.get(i);
-                            Log.d(TAG, "startindex "+startIndex);
-                        }
-                        Log.d(TAG, "indexxxx "+distances.indexOf(MainActivity.shortestDistance));
-                        int endIndex=startIndex+ polylineNumbers.get(distances.indexOf(MainActivity.shortestDistance));
-                        Log.d(TAG, "endIndex "+endIndex);
+                polylineOptionsArrayList.add(polylineOptions);
+
+            } else {
+                polylineOptionsArrayList.add(null);
+//                Toast.makeText(getApplicationContext(), "Direction not found!", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onPostExecute: ya babaaaa direction not found ");
+            }
+            if (polylineOptionsArrayList.size() == totalNbPoly && MainActivity.shortestDistanceIndex != -1) {
+                for (int i = 0; i < MainActivity.shortestDistanceIndex; i++) {
+                    Log.d(TAG, "indexx " + MainActivity.shortestDistanceIndex);
+                    Log.d(TAG, "polynumbers " + polylineNumbers);
+                    startIndex += polylineNumbers.get(i);
+                    Log.d(TAG, "startindex " + startIndex);
+                }
+                Log.d(TAG, "adihi list li n3amro biha infos " + MainActivity.lakhra.get(MainActivity.shortestDistanceIndex));
+                Log.d(TAG, "indexxxx " + MainActivity.shortestDistanceIndex);
+                int endIndex = startIndex + polylineNumbers.get(MainActivity.shortestDistanceIndex);
+                Log.d(TAG, "endIndex " + endIndex);
 //                        MainActivity.mMap.addPolyline(polylineOptionsArrayList.get(6));
 //                        MainActivity.mMap.addPolyline(polylineOptionsArrayList.get(7));
 //                        MainActivity.mMap.addPolyline(polylineOptionsArrayList.get(8));
 //                        ArrayList<PolylineOptions> finalPolys = polylineOptionsArrayList.subList(startIndex,endIndex);
-                        for (int m=startIndex ;m<endIndex;m++){
-                            MainActivity.mMap.addPolyline(polylineOptionsArrayList.get(m));
-                            Log.d(TAG, "mmm "+m);
-                        }
+                for (int m = startIndex; m < endIndex; m++) {
+                    if (polylineOptionsArrayList.get(m) != null) {
+                        MainActivity.mMap.addPolyline(polylineOptionsArrayList.get(m));
+                        Log.d(TAG, "mmm " + m);
+                    } else {
+                        Log.d(TAG, "null adik matrssmtch mais bon");
                     }
 
-                } else {
-//                Toast.makeText(getApplicationContext(), "Direction not found!", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "onPostExecute: ya babaaaa direction not found ");
                 }
+            } else if (MainActivity.shortestDistanceIndex == -1) {
+                Log.d(TAG, "Internet is Poor");
+            }
 
-            Log.d(TAG, "list poly "+polylineOptionsArrayList);
+
+            //Get list route and display it into the map
 
 
-//                Log.d(TAG, "results brk ");
+//            Log.d(TAG, "list poly " + polylineOptionsArrayList);
 
-//            return meanObject;
         }
 
     }
 
-//    public static void bestMean(FirebaseCallback firebaseCallback ) {
-//        if (meanObject.size() == Nb) {
-//            int distanceReturned = acumilatorDurationDistance(meanObject);
-//            meanObject.clear();
-//            distances.add(distanceReturned);
-//            if (distanceReturned <= MainActivity.shortestDistance){
-//                MainActivity.shortestDistance = distanceReturned;
-////                    index = iterator;
-//                Log.d(TAG, "shortest distance is "+MainActivity.shortestDistance);
-//                Log.d(TAG, "index ta shortest distance is "+distances.indexOf(MainActivity.shortestDistance));
-//            }
-//            else {
-//                iterator++;
-//                Log.d(TAG, "shortest aw 9bl wla aw jay ");
-//            }
-//            Log.d(TAG, "index ta shortest distance is "+distances.indexOf(MainActivity.shortestDistance));
-//
-//        }
-//    }
 }
