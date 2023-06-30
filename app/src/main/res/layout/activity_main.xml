@@ -65,6 +65,7 @@
             app:fabCustomSize="40dp" />
 
         <include
+            android:id="@+id/layout_include"
             layout="@layout/bottom_sheet_layout"/>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

@@ -41,6 +41,7 @@ import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static boolean mod = false;
     public static int shortestDistance;
     public static int shortestDistanceIndex;
-    //    BottomSheetBehavior bottomSheetBehavior;
+        BottomSheetBehavior bottomSheetBehavior;
     CoordinatorLayout bottomSheetContainer;
     ArrayList<Object> listOfLists;
     public static List<ArrayList<Object>> lakhra;
@@ -94,11 +95,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        bottomSheetContainer = findViewById(R.id.bottomsheetcontainer);
-        View bottomSheet = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_layout, bottomSheetContainer, false);
-        bottomSheetContainer.addView(bottomSheet);
         BestOnePath bestOnePath = new BestOnePath(this);
+
+
+//        bottomSheetContainer = findViewById(R.id.bottomsheetcontainer);
 //        bottomSheetBehavior =BottomSheetBehavior.from(bottomSheetContainer);
+//        View bottomSheet = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_layout, bottomSheetContainer, false);
+//        bottomSheetContainer.addView(layoutInclude);
+
+
+        View layoutInclude = findViewById(R.id.layout_include);
+        bottomSheetBehavior =BottomSheetBehavior.from(layoutInclude);
+        bottomSheetBehavior.setHideable(true);
+        bottomSheetBehavior.setPeekHeight(0);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+//        bottomSheetContainer.addView(layoutInclude);
+
+
+//        bottomSheetBehavior.setPeekHeight(0);
+//        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+//        bottomSheetBehavior.setHideable(true);
+
         listPoints = new ArrayList<>();
         locdest = new ArrayList<>();
         locdest1 = new ArrayList<>();
@@ -112,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         waypoints2 = new ArrayList<>();
         wayppt = new ArrayList<>();
 
-         recyclerView = bottomSheet.findViewById(R.id.stationsList);
+         recyclerView = layoutInclude.findViewById(R.id.stationsList);
 //        ArrayList<StationItem> stationItems = new ArrayList<StationItem>();
 //        stationItems.add(new StationItem("Babazg&ag ", R.drawable.endpoint));
 //        stationItems.add(new StationItem("Babazg&ag ", R.drawable.closest_origin));
@@ -148,13 +165,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         currentLocationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                bottomSheetBehavior.setPeekHeight(0);
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+//                bottomSheetBehavior.setState(Sta);
 
-
-//                enableCurrentLocation();
-//                showDialog("test");
-//                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//                bottomSheetBehavior.setPeekHeight(200);
-//                bottomSheetBehavior.setHideable(true);
                 mMap.clear();
                 moveCameraToLocation(new LatLng(35.665618, -0.634003), 15);
             }
@@ -194,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 BestOnePath.polylineOptionsArrayList.clear();
                 mMap.clear();
                 Log.d(TAG, "Aya allah yrb7 " + BestOnePath.distances + "    " + shortestDistance);
-                destinationName = (TextView) findViewById(R.id.destinationName);
+                destinationName = (TextView) layoutInclude.findViewById(R.id.destinationName);
                 destinationName.setText(place.getName());
                 bestOnePath.readData(new BestOnePath.FirebaseCallback() {
                     @Override
@@ -209,13 +223,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                        }
                     }
                 }, latlngToString(place.getLatLng()), "35.665618,-0.634003");
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-//                        showDialog(place.getName());
-
-                    }
-                }, 10000);
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                    }
+//                }, 10000);
 
 
 //                latlngToString(locdest1.get(0))
@@ -491,6 +504,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else if (recyclerView == null) {
             Log.d(TAG, "kayn errorrr ");
         }
+        bottomSheetBehavior.setPeekHeight(50);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
     }
 }
