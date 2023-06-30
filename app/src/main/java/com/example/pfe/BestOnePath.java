@@ -493,13 +493,13 @@ public class BestOnePath implements OnMapReadyCallback {
                 ArrayList<StationItem> stationItems = new ArrayList<>();
                 Log.d(TAG, "adihi list li n3amro biha infos " + MainActivity.lakhra.get(MainActivity.shortestDistanceIndex));
                 List<String> stationsForBottomSheet = bestOnePath.castObjectToList(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(7));
-                stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(4).toString(), R.drawable.first_station));
+                stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(4).toString(), R.drawable.endpoint));
                 for (int s = 0; s < stationsForBottomSheet.size(); s++) {
                     stationItems.add(new StationItem(stationsForBottomSheet.get(s), R.drawable.middle_station));
 //                    Log.d(TAG, "stationsbotom " + stationsForBottomSheet.get(s));
 //                    Log.d(TAG, "stations " + stationItems);
                 }
-                stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(6).toString(), R.drawable.final_station));
+                stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(6).toString(), R.drawable.endpoint));
 //                Log.d(TAG, "reccc " + stationItems);
 
 //                MainActivity.recyclerView.setLayoutManager(new LinearLayoutManager(this));

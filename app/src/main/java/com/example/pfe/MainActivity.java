@@ -13,15 +13,20 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -44,6 +49,7 @@ import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -83,8 +89,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static boolean mod = false;
     public static int shortestDistance;
     public static int shortestDistanceIndex;
-
-//    RecyclerView recyclerView;
+//    BottomSheetBehavior bottomSheetBehavior;
+    CoordinatorLayout bottomSheetContainer;
     ArrayList<Object> listOfLists;
     public static List<ArrayList<Object>> lakhra;
     TextView destinationName;
@@ -95,6 +101,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        bottomSheetContainer = findViewById(R.id.bottomsheetcontainer);
+        View bottomSheet = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_layout,bottomSheetContainer,false);
+                bottomSheetContainer.addView(bottomSheet);
+
+
+//        bottomSheetBehavior =BottomSheetBehavior.from(bottomSheetContainer);
         listPoints = new ArrayList<>();
         locdest = new ArrayList<>();
         locdest1 = new ArrayList<>();
@@ -113,19 +125,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        BestOnePath.TaskParser taskParser = new BestOnePath.TaskParser();
 //        stationItems= taskParser.parseTasks();
 
-        RecyclerView recyclerView = findViewById(R.id.stationsList);
-//        ArrayList<StationItem> stationItems = new ArrayList<StationItem>();
-//        stationItems.add(new StationItem("Babazg&ag ", R.drawable.first_station));
-//        stationItems.add(new StationItem("Babaffzefez ", R.drawable.middle_station));
-//        stationItems.add(new StationItem("Baba wfezef &g", R.drawable.middle_station));
-//        stationItems.add(new StationItem("Baba weldi ", R.drawable.final_station));
-////        Log.d(TAG, "stationsitemses " + stationItemses);
+        RecyclerView recyclerView = bottomSheet.findViewById(R.id.stationsList);
+
+        ArrayList<StationItem> stationItems = new ArrayList<StationItem>();
+        stationItems.add(new StationItem("Babazg&ag ", R.drawable.endpoint));
+        stationItems.add(new StationItem("Babazg&ag ", R.drawable.closest_origin));
+        stationItems.add(new StationItem("Baba wfezef &g", R.drawable.middle_station));
+        stationItems.add(new StationItem("Baba weldi ", R.drawable.closest_destination));
+        stationItems.add(new StationItem("Babazg&ag ", R.drawable.endpoint));
+//        Log.d(TAG, "stationsitemses " + stationItemses);
 //
 //        Log.d(TAG, "statttttt " + stationItems);
-//        myAdapter = new MyAdapter(this, stationItems);
+        myAdapter = new MyAdapter(this, stationItems);
 //        if (recyclerView != null) {
-//            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//            recyclerView.setAdapter(myAdapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setAdapter(myAdapter);
+
 //        }else if(recyclerView==null){
 //            Log.d(TAG, "kayn errorrr ");
 //
@@ -153,8 +168,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         currentLocationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
 //                enableCurrentLocation();
 //                showDialog("test");
+//                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//                bottomSheetBehavior.setPeekHeight(200);
+//                bottomSheetBehavior.setHideable(true);
                 mMap.clear();
                 moveCameraToLocation(new LatLng(35.665618, -0.634003), 15);
             }
@@ -194,7 +214,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 BestOnePath.polylineOptionsArrayList.clear();
                 mMap.clear();
                 Log.d(TAG, "Aya allah yrb7 " + BestOnePath.distances + "    " + shortestDistance);
-
+                destinationName = (TextView) findViewById(R.id.destinationName);
+                destinationName.setText(place.getName());
                 bestOnePath.readData(new BestOnePath.FirebaseCallback() {
                     @Override
                     public void onCallback(ArrayList<Object> list, long number) {

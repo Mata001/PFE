@@ -5,7 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/dialog_bg"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    app:layout_behavior="@string/bottom_sheet_behavior"
+    app:behavior_hideable="false"
+    app:behavior_peekHeight="300dp">
 
     <TextView
         android:layout_width="wrap_content"
@@ -23,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="50dp"
-            android:src="@drawable/endpointstation" />
+            android:src="@drawable/walking" />
 
         <LinearLayout
             android:layout_width="50dp"
@@ -104,57 +107,13 @@
 
         </LinearLayout>
 
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="10dp"
-                android:src="@drawable/endpoint" />
-
-            <TextView
-                android:id="@+id/closest_origin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Rond point ensep"
-                android:textSize="15dp" />
-
-
-        </LinearLayout>
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/stationsList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:itemCount="3"
+            android:layout_height="wrap_content"
             tools:listitem="@layout/station_layout_dg" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="10dp"
-                android:rotation="180"
-                android:src="@drawable/endpoint" />
-
-            <TextView
-                android:id="@+id/closest_dest"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:text="Rond point ensep"
-                android:textSize="15dp" />
-
-        </LinearLayout>
 
 
     </LinearLayout>
@@ -170,7 +129,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="50dp"
             android:rotation="180"
-            android:src="@drawable/endpointstation" />
+            android:src="@drawable/walking" />
 
         <LinearLayout
             android:layout_width="50dp"

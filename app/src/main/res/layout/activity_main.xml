@@ -8,68 +8,64 @@
 
 
     <androidx.fragment.app.FragmentContainerView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment" />
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:id="@+id/coordinator">
+        android:layout_height="120dp">
+
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="40dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
 
-            app:hintEnabled="false"
+            android:background="@drawable/text_field_bg"
             app:boxStrokeWidth="0dp"
 
+            app:hintEnabled="false"
             app:layout_anchor="@id/view"
-            app:layout_anchorGravity="bottom|center"
-            android:background="@drawable/text_field_bg"
-            >
+            app:layout_anchorGravity="bottom|center">
 
             <fragment
                 android:id="@+id/autocomplete_fragment"
                 android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="top|start"
-                 />
+                android:layout_gravity="top|start" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/view"
-        />
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    app:layout_behavior="@string/bottom_sheet_behavior"
-    tools:context=".MainActivityActivity">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/bottomsheetcontainer"
+        tools:context=".MainActivityActivity">
+
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/currLoc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="150dp"
             android:layout_marginEnd="40dp"
-            android:tint="@color/black"
             android:backgroundTint="@color/blue"
-            app:fabCustomSize="40dp"
             android:src="@drawable/pin"
-            android:id="@+id/currLoc"/>
+            android:tint="@color/black"
+            app:fabCustomSize="40dp" />
+
         <include
-            layout="@layout/bottom_sheet_layout"
-            app:layout_anchorGravity="bottom"
-            />
-
-
-
+            layout="@layout/bottom_sheet_layout"/>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
