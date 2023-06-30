@@ -559,6 +559,7 @@ public class BestOnePath implements OnMapReadyCallback {
 
                     if (stationsForBottomSheet.size() == 0) {
                         stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(3).toString(), R.drawable.endpoint));
+                        stationItems.add(new StationItem("", R.drawable.no_waypoint));
                         stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(5).toString(), R.drawable.endpoint));
 
                     } else if (stationsForBottomSheet.size() == 1) {
