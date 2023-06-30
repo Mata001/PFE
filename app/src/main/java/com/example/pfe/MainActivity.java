@@ -504,7 +504,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else if (recyclerView == null) {
             Log.d(TAG, "kayn errorrr ");
         }
-        bottomSheetBehavior.setPeekHeight(50);
+        bottomSheetBehavior.setPeekHeight(150);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
     }
