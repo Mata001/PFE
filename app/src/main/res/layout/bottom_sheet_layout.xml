@@ -67,6 +67,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/mean_box"
         android:orientation="vertical"
+        app:layout_constraintHeight_max="250dp"
         android:padding="15dp">
 
 
@@ -116,7 +117,11 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/stationsList"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
+            android:overScrollMode="always"
+            android:scrollbars="vertical"
+            android:scrollIndicators="top|bottom"
+            android:scrollbarStyle="insideInset"
             tools:listitem="@layout/station_layout_dg" />
 
 
