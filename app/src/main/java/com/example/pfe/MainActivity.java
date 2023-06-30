@@ -1,6 +1,7 @@
 package com.example.pfe;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,13 +12,20 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -39,8 +47,6 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,13 +79,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ArrayList<LatLng> locdest;
     ArrayList<LatLng> locdest1;
     ArrayList<LatLng> locdest2;
-//    public static ArrayList<JSONObject> meanObject;
+    //    public static ArrayList<JSONObject> meanObject;
     static boolean mod = false;
     public static int shortestDistance;
     public static int shortestDistanceIndex;
 
+//    RecyclerView recyclerView;
     ArrayList<Object> listOfLists;
     public static List<ArrayList<Object>> lakhra;
+    TextView destinationName;
+//    public ArrayList<StationItem> stationItems;
+    MyAdapter myAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +107,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         waypoints1 = new ArrayList<>();
         waypoints2 = new ArrayList<>();
         wayppt = new ArrayList<>();
+//        View bottomSheet = findViewById(R.layout.bottom_sheet_layout);
+//        stationName = findViewById(R.id.stationName);
+//        stationImg = findViewById(R.id.stationShape);
+//        BestOnePath.TaskParser taskParser = new BestOnePath.TaskParser();
+//        stationItems= taskParser.parseTasks();
+
+        RecyclerView recyclerView = findViewById(R.id.stationsList);
+//        ArrayList<StationItem> stationItems = new ArrayList<StationItem>();
+//        stationItems.add(new StationItem("Babazg&ag ", R.drawable.first_station));
+//        stationItems.add(new StationItem("Babaffzefez ", R.drawable.middle_station));
+//        stationItems.add(new StationItem("Baba wfezef &g", R.drawable.middle_station));
+//        stationItems.add(new StationItem("Baba weldi ", R.drawable.final_station));
+////        Log.d(TAG, "stationsitemses " + stationItemses);
+//
+//        Log.d(TAG, "statttttt " + stationItems);
+//        myAdapter = new MyAdapter(this, stationItems);
+//        if (recyclerView != null) {
+//            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//            recyclerView.setAdapter(myAdapter);
+//        }else if(recyclerView==null){
+//            Log.d(TAG, "kayn errorrr ");
+//
+//        }else {
+//            Log.d(TAG, "onCreate: khraaaa ");
+//        }
+
 //        meanObject = new ArrayList<>();
 
         BestOnePath bestOnePath = new BestOnePath();
@@ -118,8 +154,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View view) {
 //                enableCurrentLocation();
+//                showDialog("test");
                 mMap.clear();
-                moveCameraToLocation(new LatLng(35.665618,-0.634003), 15);
+                moveCameraToLocation(new LatLng(35.665618, -0.634003), 15);
             }
         });
 //--------------------------------Display map---------------------------------------
@@ -151,24 +188,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //              marker
                 BestOnePath.distances.clear();
                 shortestDistance = Integer.MAX_VALUE;
-                shortestDistanceIndex=-1;
+                shortestDistanceIndex = -1;
                 lakhra = new ArrayList<>();
                 BestOnePath.polylineNumbers.clear();
                 BestOnePath.polylineOptionsArrayList.clear();
                 mMap.clear();
-                Log.d(TAG, "Aya allah yrb7 "+BestOnePath.distances+"    " +shortestDistance);
+                Log.d(TAG, "Aya allah yrb7 " + BestOnePath.distances + "    " + shortestDistance);
 
                 bestOnePath.readData(new BestOnePath.FirebaseCallback() {
                     @Override
                     public void onCallback(ArrayList<Object> list, long number) {
                         listOfLists = new ArrayList<>();
-                        listOfLists = (ArrayList<Object>)list.clone();
+                        listOfLists = (ArrayList<Object>) list.clone();
                         lakhra.add(listOfLists);
-                        if (lakhra.size()==number){
-                            Log.d(TAG, "lakra fel meathod "+lakhra.get(1));
-                        }
+//                        if (lakhra.size()==number){
+//                            Log.d(TAG, "lakra fel meathod "+lakhra.get(0));
+////                            Log.d(TAG, "lakra fel meathod "+lakhra.get(shortestDistanceIndex));
+//                            Log.d(TAG, "onCallback: " + shortestDistanceIndex);
+//                        }
                     }
-                },latlngToString(place.getLatLng()),"35.665618,-0.634003");
+                }, latlngToString(place.getLatLng()), "35.665618,-0.634003");
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+//                        showDialog(place.getName());
+
+                    }
+                }, 10000);
+
 
 //                latlngToString(locdest1.get(0))
 //                ecole :35.665618,-0.634003
@@ -182,7 +229,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 //        ----------
+
     }
+
+
+//        BestOnePath.TaskParser taskParser = new TaskParser();
+//        BestOnePath.TaskParser taskParser= new BestOnePath.TaskParser();
+//        ArrayList<StationItem> stationItems = taskParser.parseTasks();
+
+
+//    public void showDialog(String placeName) {
+//        final Dialog dialog = new Dialog(this);
+//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        dialog.setContentView(R.layout.bottom_sheet_layout);
+//        destinationName = dialog.findViewById(R.id.destinationName);
+//        RecyclerView recyclerView = dialog.findViewById(R.id.stationsList);
+//
+//        destinationName.setText(placeName);
+////        Log.d(TAG, "statttttt 2" + stationItemses);
+////        myAdapter = new MyAdapter(this, stationItemses);
+////        if (recyclerView != null) {
+////            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+////            recyclerView.setAdapter(myAdapter);
+////        }else if(recyclerView==null){
+////            Log.d(TAG, "kayn errorrr ");
+////
+////        }else {
+////            Log.d(TAG, "onCreate: khraaaa ");
+////        }
+////        Log.d(TAG, "showDialog: ");
+//
+//        dialog.show();
+//        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+//        dialog.getWindow().setGravity(Gravity.BOTTOM);
+//    }
+
     //--------------------------------Enable Current Location--------------------------------
     private void enableCurrentLocation() {
         // Check if the device has location services enabled
@@ -203,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (location != null) {
                     // Move the camera to the user's current location
                     LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    moveCameraToLocation(new LatLng(35.665618,-0.634003), 15);
+                    moveCameraToLocation(new LatLng(35.665618, -0.634003), 15);
                     locdest1.clear();
                     locdest1.add(currentLatLng);
                 } else {
@@ -281,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Set waypoints those are the bus stations
         String way = "waypoints=" + waypointsString;
         //Mode for find direction
-        String mod = "mode="+mode;
+        String mod = "mode=" + mode;
         //String key for api key
         String key = "key=AIzaSyARlcOfXAA-JfGWFW6VH8AbtQbI96qjj6I";
         //Build the full param
@@ -291,7 +373,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         wayppt.clear();
         return url;
     }
-
 
 
     //--------------------------------Location Permission--------------------------------
@@ -337,9 +418,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (lol.size() == 2) {
             //Create the URL to get request from first marker to second marker
-            String url = getRequestUrl(lol.get(0), lol.get(1), wayppt,"driving");
+            String url = getRequestUrl(lol.get(0), lol.get(1), wayppt, "driving");
             BestOnePath.TaskRequestDirections taskRequestDirections = new BestOnePath.TaskRequestDirections();
-            taskRequestDirections.execute(url,"1");
+            taskRequestDirections.execute(url, "1");
         }
     }
 

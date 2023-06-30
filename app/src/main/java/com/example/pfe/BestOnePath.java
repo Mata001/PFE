@@ -489,7 +489,23 @@ public class BestOnePath implements OnMapReadyCallback {
                     startIndex += polylineNumbers.get(i);
                     Log.d(TAG, "startindex " + startIndex);
                 }
+                BestOnePath bestOnePath = new BestOnePath();
+                ArrayList<StationItem> stationItems = new ArrayList<>();
                 Log.d(TAG, "adihi list li n3amro biha infos " + MainActivity.lakhra.get(MainActivity.shortestDistanceIndex));
+                List<String> stationsForBottomSheet = bestOnePath.castObjectToList(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(7));
+                stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(4).toString(), R.drawable.first_station));
+                for (int s = 0; s < stationsForBottomSheet.size(); s++) {
+                    stationItems.add(new StationItem(stationsForBottomSheet.get(s), R.drawable.middle_station));
+//                    Log.d(TAG, "stationsbotom " + stationsForBottomSheet.get(s));
+//                    Log.d(TAG, "stations " + stationItems);
+                }
+                stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(6).toString(), R.drawable.final_station));
+//                Log.d(TAG, "reccc " + stationItems);
+
+//                MainActivity.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//                MyAdapter myAdapter = new MyAdapter(this,stationItems);
+//                MainActivity.recyclerView.setAdapter(myAdapter);
+
                 Log.d(TAG, "indexxxx " + MainActivity.shortestDistanceIndex);
                 int endIndex = startIndex + polylineNumbers.get(MainActivity.shortestDistanceIndex);
                 Log.d(TAG, "endIndex " + endIndex);
@@ -507,7 +523,9 @@ public class BestOnePath implements OnMapReadyCallback {
 
                 }
             } else if (MainActivity.shortestDistanceIndex == -1) {
+                MainActivity.shortestDistance = Integer.MAX_VALUE;
                 Log.d(TAG, "Internet is Poor");
+
             }
 
 
@@ -518,6 +536,29 @@ public class BestOnePath implements OnMapReadyCallback {
 
         }
 
+//        public ArrayList<StationItem> parseTasks() {
+//            BestOnePath bestOnePath = new BestOnePath();
+//            List<String> stationsForBottomSheet = bestOnePath.castObjectToList(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(7));
+//            Log.d(TAG, "parseTasks " + stationsForBottomSheet);
+//
+//            stationItems = new ArrayList<>();
+//            stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(4).toString(), R.drawable.first));
+//
+//            for (int s = 0; s < stationsForBottomSheet.size(); s++) {
+//                stationItems.add(new StationItem(stationsForBottomSheet.get(s), R.drawable.elipsestation));
+//                Log.d(TAG, "stationsbotom " + stationsForBottomSheet.get(s));
+//                Log.d(TAG, "stations " + stationItems);
+//            }
+//            stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(6).toString(), R.drawable.final_station));
+//            Log.d(TAG, "aaaaaaa " + stationItems);
+////            stationsReturned.onCallback(stationItems);
+//            return stationItems;
+//        }
+
     }
+//    public interface StationsReturned {
+//        void onCallback(ArrayList<StationItem> list);
+//    }
+
 
 }
