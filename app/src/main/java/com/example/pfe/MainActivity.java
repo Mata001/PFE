@@ -1,7 +1,6 @@
 package com.example.pfe;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,15 +11,8 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,7 +41,6 @@ import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -59,7 +50,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, BestOnePath.StationsReturned {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static String TAG = "info:";
     public static GoogleMap mMap;
@@ -89,23 +80,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static boolean mod = false;
     public static int shortestDistance;
     public static int shortestDistanceIndex;
-//    BottomSheetBehavior bottomSheetBehavior;
+    //    BottomSheetBehavior bottomSheetBehavior;
     CoordinatorLayout bottomSheetContainer;
     ArrayList<Object> listOfLists;
     public static List<ArrayList<Object>> lakhra;
     TextView destinationName;
-//    public ArrayList<StationItem> stationItems;
+    public static RecyclerView recyclerView;
+    //    public ArrayList<StationItem> stationItems;
     MyAdapter myAdapter;
+    public BestOnePath.TaskParser taskParser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bottomSheetContainer = findViewById(R.id.bottomsheetcontainer);
-        View bottomSheet = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_layout,bottomSheetContainer,false);
-                bottomSheetContainer.addView(bottomSheet);
-
-
+        View bottomSheet = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_layout, bottomSheetContainer, false);
+        bottomSheetContainer.addView(bottomSheet);
+        BestOnePath bestOnePath = new BestOnePath(this);
 //        bottomSheetBehavior =BottomSheetBehavior.from(bottomSheetContainer);
         listPoints = new ArrayList<>();
         locdest = new ArrayList<>();
@@ -119,38 +111,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         waypoints1 = new ArrayList<>();
         waypoints2 = new ArrayList<>();
         wayppt = new ArrayList<>();
-//        View bottomSheet = findViewById(R.layout.bottom_sheet_layout);
-//        stationName = findViewById(R.id.stationName);
-//        stationImg = findViewById(R.id.stationShape);
-//        BestOnePath.TaskParser taskParser = new BestOnePath.TaskParser();
-//        stationItems= taskParser.parseTasks();
 
-        RecyclerView recyclerView = bottomSheet.findViewById(R.id.stationsList);
-
-        ArrayList<StationItem> stationItems = new ArrayList<StationItem>();
-        stationItems.add(new StationItem("Babazg&ag ", R.drawable.endpoint));
-        stationItems.add(new StationItem("Babazg&ag ", R.drawable.closest_origin));
-        stationItems.add(new StationItem("Baba wfezef &g", R.drawable.middle_station));
-        stationItems.add(new StationItem("Baba weldi ", R.drawable.closest_destination));
-        stationItems.add(new StationItem("Babazg&ag ", R.drawable.endpoint));
+         recyclerView = bottomSheet.findViewById(R.id.stationsList);
+//        ArrayList<StationItem> stationItems = new ArrayList<StationItem>();
+//        stationItems.add(new StationItem("Babazg&ag ", R.drawable.endpoint));
+//        stationItems.add(new StationItem("Babazg&ag ", R.drawable.closest_origin));
+//        stationItems.add(new StationItem("Baba wfezef &g", R.drawable.middle_station));
+//        stationItems.add(new StationItem("Baba weldi ", R.drawable.closest_destination));
+//        stationItems.add(new StationItem("Babazg&ag ", R.drawable.endpoint));
 //        Log.d(TAG, "stationsitemses " + stationItemses);
-//
+//        ArrayList<StationItem> stationItems = new ArrayList<StationItem>();
 //        Log.d(TAG, "statttttt " + stationItems);
-        myAdapter = new MyAdapter(this, stationItems);
+//        myAdapter = new MyAdapter(this, stationItems);
 //        if (recyclerView != null) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            recyclerView.setAdapter(myAdapter);
-
-//        }else if(recyclerView==null){
+//            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//            recyclerView.setAdapter(myAdapter);
+//        } else if (recyclerView == null) {
 //            Log.d(TAG, "kayn errorrr ");
 //
-//        }else {
-//            Log.d(TAG, "onCreate: khraaaa ");
 //        }
 
-//        meanObject = new ArrayList<>();
-
-        BestOnePath bestOnePath = new BestOnePath();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
@@ -252,7 +232,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        ----------
 
     }
-
 
 //        BestOnePath.TaskParser taskParser = new TaskParser();
 //        BestOnePath.TaskParser taskParser= new BestOnePath.TaskParser();
@@ -492,5 +471,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Toast.makeText(this, "Tap twice to exit", Toast.LENGTH_SHORT).show();
         }
         mPressed = System.currentTimeMillis();
+    }
+
+    public void someMethode(){
+//        BestOnePath.TaskParser taskParser1 = new BestOnePath.TaskParser(this);/
+
+    }
+
+    @Override
+    public void onCallbackStations(ArrayList<StationItem> list) {
+        Log.d(TAG, "onCallbackStations: "+list);
+        ArrayList<StationItem> stationItems = new ArrayList<StationItem>(list);
+        Log.d(TAG, "statttttt " + stationItems);
+        myAdapter = new MyAdapter(this, stationItems);
+        if (recyclerView != null) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setAdapter(myAdapter);
+        } else if (recyclerView == null) {
+            Log.d(TAG, "kayn errorrr ");
+        }
+
     }
 }
