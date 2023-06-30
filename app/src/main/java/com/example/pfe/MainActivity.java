@@ -483,6 +483,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d(TAG, "onCallbackStations: "+list);
         ArrayList<StationItem> stationItems = new ArrayList<StationItem>(list);
         Log.d(TAG, "statttttt " + stationItems);
+
         myAdapter = new MyAdapter(this, stationItems);
         if (recyclerView != null) {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));

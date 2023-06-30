@@ -48,6 +48,9 @@ public class BestOnePath implements OnMapReadyCallback {
     List<String> waypoints = new ArrayList<>();
     List<String> waypoints1 = new ArrayList<>();
     List<String> waypoints2 = new ArrayList<>();
+    List<String> waypointsName = new ArrayList<>();
+    List<String> waypoints1Name = new ArrayList<>();
+    List<String> waypoints2Name = new ArrayList<>();
     List<String> wayppt = new ArrayList<>();
     List<List<String>> meanWaypoints = new ArrayList<>();
     //    static final ArrayList<Object> meanStations= new ArrayList<>();
@@ -90,12 +93,14 @@ public class BestOnePath implements OnMapReadyCallback {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     number++;
                     ArrayList<String> destinations = new ArrayList<>();
+                    ArrayList<String> destinationsName = new ArrayList<>();
                     long meanNb = snapshot.getChildrenCount();
                     String meanName = dataSnapshot.getKey();
                     long end = snapshot.child(meanName).getChildrenCount();
                     for (i = start; i < end; i++) {
                         ModelTram modelTram = snapshot.child(meanName).child(Integer.toString(i)).getValue(ModelTram.class);
                         destinations.add(modelTram.getCoordinates());
+                        destinationsName.add(modelTram.getName());
 
                     }
                     Log.d(TAG, "Mean :" + meanName + ", Number :" + end + ", Stations :" + destinations);
@@ -112,13 +117,15 @@ public class BestOnePath implements OnMapReadyCallback {
 
                         @Override
                         public void onClosestPointReceived(String closestPoint) {
+
                             SClosestIndex = destinations.indexOf(closestPoint);
-                            Log.d(TAG, "index ta Origin " + SClosestIndex);
+                            String closestS = destinationsName.get(SClosestIndex);
+                            Log.d(TAG, "index ta Origin " + SClosestIndex+"  "+closestS);
                             info.clear();
                             info.add(origin);
                             info.add(destination);
                             info.add(meanName);
-                            info.add(SClosestIndex);
+                            info.add(closestS);
                             info.add(closestPoint);
                         }
                     });
@@ -139,29 +146,36 @@ public class BestOnePath implements OnMapReadyCallback {
                         @Override
                         public void onClosestPointReceived(String closestPoint) {
                             EClosestIndex = destinations.indexOf(closestPoint);
-                            Log.d(TAG, "Index ta Destination " + EClosestIndex);
+                            String closestE = destinationsName.get(EClosestIndex);
+                            Log.d(TAG, "Index ta Destination " + EClosestIndex + "  "+closestE);
                             if (EClosestIndex == SClosestIndex) {
                                 Log.d(TAG, "dir directions direct a lhaj");
                                 getInfo(info);
                                 firebaseCallback.onCallback(info, meanNb);
                             } else if (EClosestIndex != SClosestIndex) {
 //                                wpptNb = -EClosestIndex + SClosestIndex - 1;
-                                info.add(EClosestIndex);
+                                info.add(closestE);
                                 info.add(closestPoint);
                                 if (EClosestIndex > SClosestIndex) {
                                     wpptNb = EClosestIndex - SClosestIndex - 1;
                                     if (wpptNb < 26) {
+                                        waypointsName = destinationsName.subList(SClosestIndex + 1, EClosestIndex);
                                         waypoints = destinations.subList(SClosestIndex + 1, EClosestIndex);
-                                        Log.d(TAG, "wahd " + waypoints);
+                                        Log.d(TAG, "wahd " + waypoints+"    "+waypoints1Name);
                                         info.add(waypoints);
+                                        info.add(waypointsName);
                                     } else if (wpptNb > 25) {
                                         waypoints1 = destinations.subList(SClosestIndex + 1, SClosestIndex + 26);
                                         waypoints2 = destinations.subList(SClosestIndex + 27, EClosestIndex);
-                                        Log.d(TAG, "lowl " + waypoints1);
-                                        Log.d(TAG, "tani " + waypoints2);
+                                        waypoints1Name = destinationsName.subList(SClosestIndex + 1, SClosestIndex + 26);
+                                        waypoints2Name = destinationsName.subList(SClosestIndex + 27, EClosestIndex);
+                                        Log.d(TAG, "lowl " + waypoints1+ "  "+waypoints1Name );
+                                        Log.d(TAG, "tani " + waypoints2+"   "+waypoints2Name );
                                         info.add(waypoints1);
                                         info.add(destinations.get(SClosestIndex + 26));
                                         info.add(waypoints2);
+                                        info.add(waypoints1Name);
+                                        info.add(waypoints2Name);
                                     }
                                     getInfo(info);
                                     firebaseCallback.onCallback(info, meanNb);
@@ -170,16 +184,22 @@ public class BestOnePath implements OnMapReadyCallback {
                                     wpptNb = -EClosestIndex + SClosestIndex - 1;
                                     if (wpptNb < 26) {
                                         waypoints = destinations.subList(EClosestIndex + 1, SClosestIndex);
-                                        Log.d(TAG, "wahd " + waypoints);
+                                        waypointsName = destinationsName.subList(EClosestIndex + 1, SClosestIndex);
+                                        Log.d(TAG, "wahd " + waypoints+"    "+waypoints1Name);
                                         info.add(waypoints);
+                                        info.add(waypointsName);
                                     } else if (wpptNb > 25) {
                                         waypoints1 = destinations.subList(EClosestIndex + 1, EClosestIndex + 26);
                                         waypoints2 = destinations.subList(EClosestIndex + 27, SClosestIndex);
-                                        Log.d(TAG, "lowl " + waypoints1);
-                                        Log.d(TAG, "tani " + waypoints2);
+                                        waypoints1Name = destinationsName.subList(EClosestIndex + 1, EClosestIndex + 26);
+                                        waypoints2Name = destinationsName.subList(EClosestIndex + 27, SClosestIndex);
+                                        Log.d(TAG, "lowl " + waypoints1+"   "+waypoints1Name);
+                                        Log.d(TAG, "tani " + waypoints2+"   "+waypoints2Name);
                                         info.add(waypoints1);
                                         info.add(destinations.get(EClosestIndex + 26));
                                         info.add(waypoints2);
+                                        info.add(waypoints1Name);
+                                        info.add(waypoints2Name);
                                     }
                                     getInfo(info);
                                     firebaseCallback.onCallback(info, meanNb);
@@ -217,12 +237,12 @@ public class BestOnePath implements OnMapReadyCallback {
                 String destinationUrl = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(1)), castObjectToLatLng(lista.get(6)), khawi, "walking");
                 urls.add(originUrl);
                 urls.add(destinationUrl);
-                if (lista.size() == 8) {
+                if (lista.size() == 9) {
                     String url = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(4)), castObjectToLatLng(lista.get(6)), castObjectToList(lista.get(7)), "driving");
                     Log.d(TAG, "urls ta direction ki maykounch chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url);
                     urls.add(url);
 
-                } else if (lista.size() == 10) {
+                } else if (lista.size() == 12) {
                     String url1 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(4)), castObjectToLatLng(lista.get(8)), castObjectToList(lista.get(7)), "driving");
                     String url2 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(8)), castObjectToLatLng(lista.get(6)), castObjectToList(lista.get(9)), "driving");
                     Log.d(TAG, "urls ta direction ki ykoun chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url1 + "\n" + url2);
@@ -244,12 +264,12 @@ public class BestOnePath implements OnMapReadyCallback {
                 String destinationUrl = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(1)), castObjectToLatLng(lista.get(6)), khawi, "walking");
                 urls.add(originUrl);
                 urls.add(destinationUrl);
-                if (lista.size() == 8) {
+                if (lista.size() == 9) {
                     String url = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(4)), castObjectToLatLng(lista.get(6)), castObjectToList(lista.get(7)), "walking");
                     Log.d(TAG, "urls ta direction ki maykounch chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url);
                     urls.add(url);
 
-                } else if (lista.size() == 10) {
+                } else if (lista.size() == 12) {
                     String url1 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(4)), castObjectToLatLng(lista.get(8)), castObjectToList(lista.get(7)), "walking");
                     String url2 = MainActivity.getRequestUrl(castObjectToLatLng(lista.get(8)), castObjectToLatLng(lista.get(6)), castObjectToList(lista.get(9)), "walking");
                     Log.d(TAG, "urls ta direction ki ykoun chunk \n" + originUrl + "\n" + destinationUrl + "\n" + url1 + "\n" + url2);
@@ -535,30 +555,30 @@ public class BestOnePath implements OnMapReadyCallback {
 //                    BestOnePath bestOnePath = new BestOnePath();
 
                     Log.d(TAG, "adihi list li n3amro biha infos " + MainActivity.lakhra.get(MainActivity.shortestDistanceIndex));
-                    List<String> stationsForBottomSheet =castObjectToList(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(7));
+                    List<String> stationsForBottomSheet =castObjectToList(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(8));
 
                     if (stationsForBottomSheet.size() == 0) {
-                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(4).toString(), R.drawable.endpoint));
-                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(6).toString(), R.drawable.endpoint));
+                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(3).toString(), R.drawable.endpoint));
+                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(5).toString(), R.drawable.endpoint));
 
                     } else if (stationsForBottomSheet.size() == 1) {
-                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(4).toString(), R.drawable.endpoint));
+                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(3).toString(), R.drawable.endpoint));
                         stationItems.add(new StationItem(stationsForBottomSheet.get(0), R.drawable.one_station));
-                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(6).toString(), R.drawable.endpoint));
+                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(5).toString(), R.drawable.endpoint));
                     } else if (stationsForBottomSheet.size() == 2) {
-                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(4).toString(), R.drawable.endpoint));
+                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(3).toString(), R.drawable.endpoint));
                         stationItems.add(new StationItem(stationsForBottomSheet.get(0), R.drawable.closest_origin));
                         stationItems.add(new StationItem(stationsForBottomSheet.get(1), R.drawable.closest_destination));
-                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(6).toString(), R.drawable.endpoint));
+                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(5).toString(), R.drawable.endpoint));
                     } else if (stationsForBottomSheet.size() > 2){
-                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(4).toString(), R.drawable.endpoint));
+                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(3).toString(), R.drawable.endpoint));
                         stationItems.add(new StationItem(stationsForBottomSheet.get(0), R.drawable.closest_origin));
                         for (
                                 int s = 1; s < stationsForBottomSheet.size() - 1; s++) {
                             stationItems.add(new StationItem(stationsForBottomSheet.get(s), R.drawable.middle_station));
                         }
                         stationItems.add(new StationItem(stationsForBottomSheet.get(stationsForBottomSheet.size() - 1), R.drawable.closest_destination));
-                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(6).toString(), R.drawable.endpoint));
+                        stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(5).toString(), R.drawable.endpoint));
 
                     }
                     Log.d(TAG, "reccc " + stationItems);
