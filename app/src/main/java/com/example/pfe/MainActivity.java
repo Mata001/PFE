@@ -15,7 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -33,6 +33,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
@@ -45,6 +46,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     List<String> empty;
     ArrayList<LatLng> locdest;
     ArrayList<LatLng> locdest1;
+    private static int counter = 0;
     ArrayList<LatLng> locdest2;
     //    public static ArrayList<JSONObject> meanObject;
     static boolean mod = false;
@@ -151,6 +155,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
+        FloatingActionButton userGuideBtn = findViewById(R.id.userGuide);
+        FloatingActionButton mapStyleBtn = findViewById(R.id.style);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
@@ -171,6 +177,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 mMap.clear();
                 moveCameraToLocation(new LatLng(35.665618, -0.634003), 15);
+            }
+        });
+        //-----------------------------userguide -------------------------------------
+        userGuideBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, UserGuideActivityForbutton.class);
+                startActivity(intent);
+            }
+        });
+        //-----------------------------mapStyle -------------------------------------
+        mapStyleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                counter++;
+
+                if (counter == 1) {
+                    // Perform action 1
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.mapstyle));
+                } else if (counter == 2) {
+                    // Perform action 2
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.darkmapstyle));
+                } else if (counter == 3) {
+                    // Perform action 3
+                    Log.d(TAG, "enableCurrentLocation: " +counter);
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.normalmapstyle));
+                    counter = 0; // Reset the counter
+                }
             }
         });
 //--------------------------------Display map---------------------------------------
