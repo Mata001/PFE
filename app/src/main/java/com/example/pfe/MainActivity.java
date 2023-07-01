@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     List<String> empty;
     ArrayList<LatLng> locdest;
     ArrayList<LatLng> locdest1;
+    private static int counter = 0;
     ArrayList<LatLng> locdest2;
 //    public static ArrayList<JSONObject> meanObject;
     static boolean mod = false;
@@ -107,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
         FloatingActionButton userGuideBtn = findViewById(R.id.userGuide);
+        FloatingActionButton mapStyleBtn = findViewById(R.id.style);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
@@ -122,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View view) {
 //                enableCurrentLocation();
+
                 mMap.clear();
                 moveCameraToLocation(new LatLng(35.665618,-0.634003), 15);
             }
@@ -132,6 +135,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, UserGuideActivityForbutton.class);
                 startActivity(intent);
+            }
+        });
+        //-----------------------------mapStyle -------------------------------------
+        mapStyleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                counter++;
+
+                if (counter == 1) {
+                    // Perform action 1
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.mapstyle));
+                } else if (counter == 2) {
+                    // Perform action 2
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.darkmapstyle));
+                } else if (counter == 3) {
+                    // Perform action 3
+                    Log.d(TAG, "enableCurrentLocation: " +counter);
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.normalmapstyle));
+                    counter = 0; // Reset the counter
+                }
             }
         });
 //--------------------------------Display map---------------------------------------
@@ -197,6 +220,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     //--------------------------------Enable Current Location--------------------------------
     private void enableCurrentLocation() {
+
+
+
         // Check if the device has location services enabled
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
@@ -232,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
 
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.mapstyle));
+
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         //--------------------------------Location Permission--------------------------------
         // Check if location permission is granted

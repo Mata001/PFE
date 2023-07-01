@@ -74,6 +74,17 @@
             app:fabCustomSize="30dp"
             android:src="@drawable/handbook"
             android:id="@+id/userGuide"/>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="50dp"
+            app:tint="@color/black"
+            android:backgroundTint="@color/yellowe"
+            app:fabCustomSize="30dp"
+            android:src="@drawable/theme"
+            android:id="@+id/style"/>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
