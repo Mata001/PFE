@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ArrayList<LatLng> locdest;
     ArrayList<LatLng> locdest1;
     private static int counter = 0;
+    private static int counterType = 0;
     ArrayList<LatLng> locdest2;
     //    public static ArrayList<JSONObject> meanObject;
     static boolean mod = false;
@@ -157,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
         FloatingActionButton userGuideBtn = findViewById(R.id.userGuide);
         FloatingActionButton mapStyleBtn = findViewById(R.id.style);
+        FloatingActionButton mapTypeBtn = findViewById(R.id.maptype);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
@@ -204,6 +206,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Log.d(TAG, "enableCurrentLocation: " +counter);
                     mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.normalmapstyle));
                     counter = 0; // Reset the counter
+                }
+            }
+        });
+
+
+        //-----------------------------mapSTpe-------------------------------------
+        mapTypeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                counterType++;
+
+                if (counterType == 1) {
+                    // Perform action 1
+                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                } else if (counterType == 2) {
+                    // Perform action 2
+                    mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                } else if (counterType == 3) {
+                    // Perform action 3
+                    Log.d(TAG, "enableCurrentLocation: " +counter);
+                    mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                    counterType = 0; // Reset the counter
                 }
             }
         });
