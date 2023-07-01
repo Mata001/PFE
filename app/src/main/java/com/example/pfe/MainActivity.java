@@ -19,7 +19,7 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -36,6 +36,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
@@ -47,6 +48,8 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,22 +81,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     List<String> empty;
     ArrayList<LatLng> locdest;
     ArrayList<LatLng> locdest1;
+    private static int counter = 0;
     ArrayList<LatLng> locdest2;
-    //    public static ArrayList<JSONObject> meanObject;
+//    public static ArrayList<JSONObject> meanObject;
     static boolean mod = false;
     public static int shortestDistance;
     public static int shortestDistanceIndex;
 
-//    RecyclerView recyclerView;
     ArrayList<Object> listOfLists;
     public static List<ArrayList<Object>> lakhra;
     TextView destinationName;
 //    public ArrayList<StationItem> stationItems;
     MyAdapter myAdapter;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         listPoints = new ArrayList<>();
         locdest = new ArrayList<>();
@@ -107,38 +112,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         waypoints1 = new ArrayList<>();
         waypoints2 = new ArrayList<>();
         wayppt = new ArrayList<>();
-//        View bottomSheet = findViewById(R.layout.bottom_sheet_layout);
-//        stationName = findViewById(R.id.stationName);
-//        stationImg = findViewById(R.id.stationShape);
-//        BestOnePath.TaskParser taskParser = new BestOnePath.TaskParser();
-//        stationItems= taskParser.parseTasks();
-
-        RecyclerView recyclerView = findViewById(R.id.stationsList);
-//        ArrayList<StationItem> stationItems = new ArrayList<StationItem>();
-//        stationItems.add(new StationItem("Babazg&ag ", R.drawable.first_station));
-//        stationItems.add(new StationItem("Babaffzefez ", R.drawable.middle_station));
-//        stationItems.add(new StationItem("Baba wfezef &g", R.drawable.middle_station));
-//        stationItems.add(new StationItem("Baba weldi ", R.drawable.final_station));
-////        Log.d(TAG, "stationsitemses " + stationItemses);
-//
-//        Log.d(TAG, "statttttt " + stationItems);
-//        myAdapter = new MyAdapter(this, stationItems);
-//        if (recyclerView != null) {
-//            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//            recyclerView.setAdapter(myAdapter);
-//        }else if(recyclerView==null){
-//            Log.d(TAG, "kayn errorrr ");
-//
-//        }else {
-//            Log.d(TAG, "onCreate: khraaaa ");
-//        }
-
 //        meanObject = new ArrayList<>();
 
         BestOnePath bestOnePath = new BestOnePath();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
+        FloatingActionButton userGuideBtn = findViewById(R.id.userGuide);
+        FloatingActionButton mapStyleBtn = findViewById(R.id.style);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
@@ -154,9 +135,37 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View view) {
 //                enableCurrentLocation();
-//                showDialog("test");
+
                 mMap.clear();
-                moveCameraToLocation(new LatLng(35.665618, -0.634003), 15);
+                moveCameraToLocation(new LatLng(35.665618,-0.634003), 15);
+            }
+        });
+        //-----------------------------userguide -------------------------------------
+        userGuideBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, UserGuideActivityForbutton.class);
+                startActivity(intent);
+            }
+        });
+        //-----------------------------mapStyle -------------------------------------
+        mapStyleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                counter++;
+
+                if (counter == 1) {
+                    // Perform action 1
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.mapstyle));
+                } else if (counter == 2) {
+                    // Perform action 2
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.darkmapstyle));
+                } else if (counter == 3) {
+                    // Perform action 3
+                    Log.d(TAG, "enableCurrentLocation: " +counter);
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.normalmapstyle));
+                    counter = 0; // Reset the counter
+                }
             }
         });
 //--------------------------------Display map---------------------------------------
@@ -188,12 +197,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //              marker
                 BestOnePath.distances.clear();
                 shortestDistance = Integer.MAX_VALUE;
-                shortestDistanceIndex = -1;
+                shortestDistanceIndex=-1;
                 lakhra = new ArrayList<>();
                 BestOnePath.polylineNumbers.clear();
                 BestOnePath.polylineOptionsArrayList.clear();
                 mMap.clear();
-                Log.d(TAG, "Aya allah yrb7 " + BestOnePath.distances + "    " + shortestDistance);
+                Log.d(TAG, "Aya allah yrb7 "+BestOnePath.distances+"    " +shortestDistance);
 
                 bestOnePath.readData(new BestOnePath.FirebaseCallback() {
                     @Override
@@ -229,42 +238,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 //        ----------
-
     }
-
-
-//        BestOnePath.TaskParser taskParser = new TaskParser();
-//        BestOnePath.TaskParser taskParser= new BestOnePath.TaskParser();
-//        ArrayList<StationItem> stationItems = taskParser.parseTasks();
-
-
-//    public void showDialog(String placeName) {
-//        final Dialog dialog = new Dialog(this);
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        dialog.setContentView(R.layout.bottom_sheet_layout);
-//        destinationName = dialog.findViewById(R.id.destinationName);
-//        RecyclerView recyclerView = dialog.findViewById(R.id.stationsList);
-//
-//        destinationName.setText(placeName);
-////        Log.d(TAG, "statttttt 2" + stationItemses);
-////        myAdapter = new MyAdapter(this, stationItemses);
-////        if (recyclerView != null) {
-////            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-////            recyclerView.setAdapter(myAdapter);
-////        }else if(recyclerView==null){
-////            Log.d(TAG, "kayn errorrr ");
-////
-////        }else {
-////            Log.d(TAG, "onCreate: khraaaa ");
-////        }
-////        Log.d(TAG, "showDialog: ");
-//
-//        dialog.show();
-//        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-//        dialog.getWindow().setGravity(Gravity.BOTTOM);
-//    }
-
     //--------------------------------Enable Current Location--------------------------------
     private void enableCurrentLocation() {
         // Check if the device has location services enabled
@@ -363,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Set waypoints those are the bus stations
         String way = "waypoints=" + waypointsString;
         //Mode for find direction
-        String mod = "mode=" + mode;
+        String mod = "mode="+mode;
         //String key for api key
         String key = "key=AIzaSyARlcOfXAA-JfGWFW6VH8AbtQbI96qjj6I";
         //Build the full param
@@ -373,6 +347,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         wayppt.clear();
         return url;
     }
+
 
 
     //--------------------------------Location Permission--------------------------------
@@ -418,9 +393,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (lol.size() == 2) {
             //Create the URL to get request from first marker to second marker
-            String url = getRequestUrl(lol.get(0), lol.get(1), wayppt, "driving");
+            String url = getRequestUrl(lol.get(0), lol.get(1), wayppt,"driving");
             BestOnePath.TaskRequestDirections taskRequestDirections = new BestOnePath.TaskRequestDirections();
-            taskRequestDirections.execute(url, "1");
+            taskRequestDirections.execute(url,"1");
         }
     }
 

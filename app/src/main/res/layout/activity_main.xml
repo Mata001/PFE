@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     tools:context=".MainActivity">
 
 
@@ -58,11 +58,33 @@
             android:layout_gravity="end"
             android:layout_marginTop="150dp"
             android:layout_marginEnd="40dp"
-            android:tint="@color/black"
+            app:tint="@color/black"
             android:backgroundTint="@color/blue"
             app:fabCustomSize="40dp"
             android:src="@drawable/pin"
             android:id="@+id/currLoc"/>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="10dp"
+            app:tint="@color/black"
+            android:backgroundTint="@color/yellowe"
+            app:fabCustomSize="30dp"
+            android:src="@drawable/handbook"
+            android:id="@+id/userGuide"/>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="50dp"
+            app:tint="@color/black"
+            android:backgroundTint="@color/yellowe"
+            app:fabCustomSize="30dp"
+            android:src="@drawable/theme"
+            android:id="@+id/style"/>
         <include
             layout="@layout/bottom_sheet_layout"
             app:layout_anchorGravity="bottom"
