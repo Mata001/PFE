@@ -21,9 +21,9 @@
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_marginLeft="50dp"
-            android:src="@drawable/endpointstation" />
+            android:src="@drawable/person_walking" />
 
         <LinearLayout
             android:layout_width="50dp"
@@ -115,7 +115,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:layout_marginRight="10dp"
-                android:src="@drawable/endpoint" />
+                android:src="@drawable/middle_station" />
 
             <TextView
                 android:id="@+id/closest_origin"
@@ -144,7 +144,7 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginRight="10dp"
                 android:rotation="180"
-                android:src="@drawable/endpoint" />
+                android:src="@drawable/middle_station" />
 
             <TextView
                 android:id="@+id/closest_dest"
@@ -167,10 +167,10 @@
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_marginLeft="50dp"
             android:rotation="180"
-            android:src="@drawable/endpointstation" />
+            android:src="@drawable/person_walking" />
 
         <LinearLayout
             android:layout_width="50dp"
