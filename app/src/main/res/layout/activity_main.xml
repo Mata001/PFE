@@ -63,30 +63,51 @@
             app:fabCustomSize="40dp"
             android:src="@drawable/pin"
             android:id="@+id/currLoc"/>
+
+
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="10dp"
-            app:tint="@color/black"
-            android:backgroundTint="@color/yellowe"
-            app:fabCustomSize="30dp"
-            android:src="@drawable/handbook"
-            android:id="@+id/userGuide"/>
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="50dp"
-            app:tint="@color/black"
-            android:backgroundTint="@color/yellowe"
-            app:fabCustomSize="30dp"
+            android:layout_gravity="end"
+            android:layout_marginTop="200dp"
+            android:layout_marginEnd="40dp"
+            android:backgroundTint="@color/itemTextColor"
             android:src="@drawable/theme"
-            android:id="@+id/style"/>
+
+            app:fabCustomSize="40dp"
+            app:tint="@color/black"
+            />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/maptype"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="250dp"
+            android:layout_marginEnd="40dp"
+            android:backgroundTint="@color/quantum_vanillagreen300"
+            android:src="@drawable/theme"
+            android:rotation="180"
+            app:fabCustomSize="40dp"
+            app:tint="@color/black"
+            />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:tint="@color/black"
+            android:backgroundTint="@color/yellowe"
+            app:fabCustomSize="40dp"
+            android:layout_gravity="end"
+            android:layout_marginTop="300dp"
+            android:layout_marginEnd="40dp"
+            android:src="@drawable/handbook"
+            android:id="@+id/userGuide"
+            app:layout_anchorGravity="bottom"
+            />
+
         <include
             layout="@layout/bottom_sheet_layout"
+            android:id="@+id/layout_include"
             app:layout_anchorGravity="bottom"
             />
 
