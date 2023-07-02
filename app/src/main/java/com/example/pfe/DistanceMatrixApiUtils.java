@@ -19,7 +19,9 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 public class DistanceMatrixApiUtils {
     private static final String TAG = "DistanceMatrixApiUtils";
-    private static final String API_KEY = "AIzaSyARlcOfXAA-JfGWFW6VH8AbtQbI96qjj6I";
+    private static final String API_KEY = "AIzaSyCpqiUvaAud8Fa3o9L29kSJ5Yzu7V8pips";
+    //            AIzaSyARlcOfXAA-JfGWFW6VH8AbtQbI96qjj6I hna ytbdl
+    //            AIzaSyCnMasBoIdVpjj97TGyBUA44oC09BMxjUs hna ytbdl
 
     public static int closestDistance=Integer.MAX_VALUE;
     public static void getDistance(String origin, String destination, DistanceCallback callback) {

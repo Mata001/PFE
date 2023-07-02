@@ -7,15 +7,14 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.content.SharedPreferences;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -46,8 +45,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,6 +92,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //    public ArrayList<StationItem> stationItems;
     MyAdapter myAdapter;
     public BestOnePath.TaskParser taskParser;
+
+    public static TextView meanName;
+    public static TextView meanDuration;
+    public static TextView orginDuration;
+    public static TextView destDuration;
+    public static ImageView meanIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,12 +156,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //
 //        }
 
+        meanName = (TextView) findViewById(R.id.meanName);
+        meanDuration = (TextView) findViewById(R.id.mean_duration);
+        orginDuration = (TextView) findViewById(R.id.walk_duration_origin);
+        destDuration = (TextView) findViewById(R.id.walk_duration_dest);
+        meanIcon = (ImageView) findViewById(R.id.meanIcon);
+
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
         FloatingActionButton userGuideBtn = findViewById(R.id.userGuide);
         FloatingActionButton mapStyleBtn = findViewById(R.id.style);
         FloatingActionButton mapTypeBtn = findViewById(R.id.maptype);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
@@ -197,14 +208,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 if (counter == 1) {
                     // Perform action 1
-                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.mapstyle));
+                    Log.d(TAG, "counterstyle1: " +counter);
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.darkmapstyle));
                 } else if (counter == 2) {
                     // Perform action 2
-                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.darkmapstyle));
+                    Log.d(TAG, "counterstyle2: " +counter);
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.normalmapstyle));
                 } else if (counter == 3) {
                     // Perform action 3
-                    Log.d(TAG, "enableCurrentLocation: " +counter);
-                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.normalmapstyle));
+                    Log.d(TAG, "counterstyle3: " +counter);
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.this, R.raw.mapstyle));
                     counter = 0; // Reset the counter
                 }
             }
@@ -219,14 +232,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 if (counterType == 1) {
                     // Perform action 1
-                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                } else if (counterType == 2) {
-                    // Perform action 2
+                    Log.d(TAG, "countertype1: " +counterType);
                     mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                } else if (counterType == 2) {
+                    Log.d(TAG, "countertype2: " +counterType);
+                    // Perform action 2
+                    mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
                 } else if (counterType == 3) {
                     // Perform action 3
-                    Log.d(TAG, "enableCurrentLocation: " +counter);
-                    mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                    Log.d(TAG, "countertype3: " +counterType);
+                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                     counterType = 0; // Reset the counter
                 }
             }
@@ -236,7 +251,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //----------------------------55------------------------------
         // Initialize Places.
         if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), "AIzaSyARlcOfXAA-JfGWFW6VH8AbtQbI96qjj6I");
+            Places.initialize(getApplicationContext(), "AIzaSyCpqiUvaAud8Fa3o9L29kSJ5Yzu7V8pips");
+//            AIzaSyARlcOfXAA-JfGWFW6VH8AbtQbI96qjj6I hna ytbdl
+//            AIzaSyCnMasBoIdVpjj97TGyBUA44oC09BMxjUs hna ytbdl
         }
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
@@ -436,7 +453,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Mode for find direction
         String mod = "mode=" + mode;
         //String key for api key
-        String key = "key=AIzaSyARlcOfXAA-JfGWFW6VH8AbtQbI96qjj6I";
+        String key = "key=AIzaSyCpqiUvaAud8Fa3o9L29kSJ5Yzu7V8pips";
+        //            AIzaSyARlcOfXAA-JfGWFW6VH8AbtQbI96qjj6I hna ytbdl
+        //            AIzaSyCnMasBoIdVpjj97TGyBUA44oC09BMxjUs hna ytbdl
         //Build the full param
         String param = alt + "&" + str_org + "&" + mod + "&" + str_dest + "&" + way + "&" + key;
         //Create url to request
@@ -554,6 +573,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d(TAG, "onCallbackStations: "+list);
         ArrayList<StationItem> stationItems = new ArrayList<StationItem>(list);
         Log.d(TAG, "statttttt " + stationItems);
+
 
         myAdapter = new MyAdapter(this, stationItems);
         if (recyclerView != null) {

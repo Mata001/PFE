@@ -3,6 +3,7 @@ package com.example.pfe;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -60,7 +61,6 @@ public class BestOnePath implements OnMapReadyCallback {
     public static ArrayList<PolylineOptions> polylineOptionsArrayList = new ArrayList<>();
     public static ArrayList<Integer> polylineNumbers = new ArrayList<>();
     public static StationsReturned stationsReturned;
-
 
 
 //    public StationsReturned stationsReturned;
@@ -328,6 +328,8 @@ public class BestOnePath implements OnMapReadyCallback {
         DirectionsParser directionsParser = new DirectionsParser();
         int total = 0;
         Log.d(TAG, "meeeee " + MainActivity.lakhra);
+        Log.d(TAG, "meeeee infoooo " + info);
+
         try {
             if (object.size() == 4) {
                 total = directionsParser.getdisdur(object.get(0)).get(1) + directionsParser.getdisdur(object.get(1)).get(1) + (directionsParser.getdisdur(object.get(2)).get(1) + directionsParser.getdisdur(object.get(3)).get(1)) / 3;
@@ -423,7 +425,6 @@ public class BestOnePath implements OnMapReadyCallback {
     public static class TaskParser extends AsyncTask<String, Void, List<List<HashMap<String, String>>>> {
         String urlsNb;
         String mode;
-
 
 
 //        public TaskParser(ArrayList<StationItem> stationItems) {
@@ -556,6 +557,14 @@ public class BestOnePath implements OnMapReadyCallback {
 
                     Log.d(TAG, "adihi list li n3amro biha infos " + MainActivity.lakhra.get(MainActivity.shortestDistanceIndex));
                     List<String> stationsForBottomSheet =castObjectToList(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(8));
+                    MainActivity.meanName.setText(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(2).toString());
+                    if (MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(2).toString().equals("Tramway")){
+                        MainActivity.meanIcon.setImageResource(R.drawable.tram_front_view);
+                    }else {
+                        MainActivity.meanIcon.setImageResource(R.drawable.front_bus);
+
+                    }
+
 
                     if (stationsForBottomSheet.size() == 0) {
                         stationItems.add(new StationItem(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(3).toString(), R.drawable.endpoint));
