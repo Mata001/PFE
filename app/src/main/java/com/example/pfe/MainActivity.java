@@ -187,9 +187,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 bottomSheetBehavior.setPeekHeight(0);
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 //                bottomSheetBehavior.setState(Sta);
-
                 mMap.clear();
-                moveCameraToLocation(new LatLng(35.665618, -0.634003), 15);
+                moveCameraToLocation(locdest1.get(0), 15);
             }
         });
         //-----------------------------userguide -------------------------------------
@@ -297,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                            Log.d(TAG, "onCallback: " + shortestDistanceIndex);
 //                        }
                     }
-                }, latlngToString(place.getLatLng()), "35.665618,-0.634003");
+                }, latlngToString(place.getLatLng()),latlngToString( locdest1.get(0)));
 //                new Handler().postDelayed(new Runnable() {
 //                    @Override
 //                    public void run() {
@@ -373,7 +372,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (location != null) {
                     // Move the camera to the user's current location
                     LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    moveCameraToLocation(new LatLng(35.665618, -0.634003), 15);
+                    moveCameraToLocation(currentLatLng, 15);
                     locdest1.clear();
                     locdest1.add(currentLatLng);
                 } else {
