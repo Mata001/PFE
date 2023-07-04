@@ -33,6 +33,7 @@
         android:textColor="@android:color/black"
         android:textAlignment="center"
         android:text="ffee"
+        android:visibility="invisible"
         android:padding="16dp" />
 
     <Button

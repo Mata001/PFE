@@ -36,8 +36,9 @@ public class UserGuideActivity extends AppCompatActivity {
         skipButton = findViewById(R.id.skipButton);
 
         // Set up the screenshot IDs and step texts
-        screenshotIds = new int[]{R.drawable.screenshot_1, R.drawable.screenshot_2, R.drawable.screenshot_3};
-        stepTexts = new String[]{"Step 1: Do this", "Step 2: Do that", "Step 3: Final step"};
+        screenshotIds = new int[]{R.drawable.screenshot_0,R.drawable.screenshot_1, R.drawable.screenshot_2, R.drawable.screenshot_3, R.drawable.screenshot_4,R.drawable.screenshot_5};
+        stepTexts = new String[]{"Step 1: ", "Step 2: ", "Step 3: ", "Step 4: " , "Step 5: ", "Step 6: "};
+
 
         // Get shared preferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);

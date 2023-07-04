@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FusedLocationProviderClient fusedLocationClient;
     private LocationManager locationManager;
     public static final int TIME_INTERVAL = 2000;
+    private ImageView header_Arrow_Image;
     private long mPressed;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
@@ -117,6 +118,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         bottomSheetBehavior.setHideable(true);
         bottomSheetBehavior.setPeekHeight(0);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        header_Arrow_Image = findViewById(R.id.bottom_sheet_arrow);
+
+        header_Arrow_Image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED){
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                } else {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+
+            }
+        });
+        bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+            }
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+                header_Arrow_Image.setRotation(slideOffset * 180);
+            }
+        });
 //        bottomSheetContainer.addView(layoutInclude);
 
 
@@ -274,13 +299,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // TODO: Get info about the selected place.
                 Toast.makeText(MainActivity.this, place.getLatLng() + place.getName() + " is your destination", Toast.LENGTH_SHORT).show();
 //              marker
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(place.getLatLng()).title("destination").icon(BitmapDescriptorFactory.fromResource(R.drawable.piner));
+                mMap.addMarker(markerOptions).showInfoWindow();
                 BestOnePath.distances.clear();
                 shortestDistance = Integer.MAX_VALUE;
                 shortestDistanceIndex = -1;
                 lakhra = new ArrayList<>();
                 BestOnePath.polylineNumbers.clear();
                 BestOnePath.polylineOptionsArrayList.clear();
-                mMap.clear();
+                //mMap.clear();
                 Log.d(TAG, "Aya allah yrb7 " + BestOnePath.distances + "    " + shortestDistance);
                 destinationName = (TextView) layoutInclude.findViewById(R.id.destinationName);
                 destinationName.setText(place.getName());
@@ -307,6 +335,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 //                latlngToString(locdest1.get(0))
 //                ecole :35.665618,-0.634003
+                Log.d(TAG, "onPlaceSelected: latlanggggggggg "+latlngToString(place.getLatLng()));
             }
 
 
@@ -523,7 +552,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //--------------------------------Move Camera/ Add Marker-------------------------------
     private void moveCameraToLocation(LatLng location, float zoom) {
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
-        mMap.addMarker(new MarkerOptions().position(location));
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(location).title("I'm here").icon(BitmapDescriptorFactory.fromResource(R.drawable.piner));
+        mMap.addMarker(markerOptions).showInfoWindow();
     }
 
     //--------------------------------Latlng to String--------------------------------

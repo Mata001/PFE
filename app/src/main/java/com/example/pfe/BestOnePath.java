@@ -4,11 +4,13 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
@@ -287,7 +289,7 @@ public class BestOnePath implements OnMapReadyCallback {
         polylineNumbers.add(urls.size());
 //        int urlsNb urls.size();
 //        Log.d(TAG, "getInfo: ");
-
+    if (urls.size()>1){
         for (String pieceUrl : urls.subList(0, 2)) {
             TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
 //            for (int l=0 ;l< 2;l++){
@@ -304,7 +306,15 @@ public class BestOnePath implements OnMapReadyCallback {
 
             TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
             taskRequestDirections.execute(pieceUrl, urlsNb, "driving");
-        }
+        }}
+    else if (urls.size()==1){
+        TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
+        taskRequestDirections.execute(urls.get(0), urlsNb, "walking");
+
+    }else{
+        Log.d(TAG, "getInfo: error bro "+urls +"    "+ urls.size());
+    }
+
 
         Log.d(TAG, "faslaaa " + urls);
     }
@@ -426,7 +436,6 @@ public class BestOnePath implements OnMapReadyCallback {
         String urlsNb;
         String mode;
 
-
 //        public TaskParser(ArrayList<StationItem> stationItems) {
 //            this.stationItems = stationItems;
 //        }
@@ -529,6 +538,7 @@ public class BestOnePath implements OnMapReadyCallback {
                 List<PatternItem> pattern;
                 if (mode == "driving") {
                     pattern = Arrays.asList(new Dash(30));
+
                 } else if (mode == "walking") {
                     pattern = Arrays.asList(new Dot(), new Gap(30));
                     polylineOptions.color(Color.argb(200, 110, 0, 15));
@@ -556,7 +566,29 @@ public class BestOnePath implements OnMapReadyCallback {
 //                    BestOnePath bestOnePath = new BestOnePath();
 
                     Log.d(TAG, "adihi list li n3amro biha infos " + MainActivity.lakhra.get(MainActivity.shortestDistanceIndex));
-                    List<String> stationsForBottomSheet =castObjectToList(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(8));
+
+                CircleOptions circleOptions1 = new CircleOptions();
+                CircleOptions circleOptions2 = new CircleOptions();
+                circleOptions1.radius(15f);
+                circleOptions1.strokeWidth(10f);
+                circleOptions1.fillColor(Color.BLACK);
+                circleOptions1.strokeColor(Color.rgb(117, 196, 249));
+                circleOptions2.radius(15f);
+                circleOptions2.strokeWidth(10f);
+
+                circleOptions2.fillColor(Color.rgb(117, 196, 249));
+                Log.d(TAG, "onPostExecute:FFFFFFFFFFFFFFFFF 1"+ MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(4).toString());
+
+                Log.d(TAG, "onPostExecute:FFFFFFFFFFFFFFFFF 2" +MainActivity.castStringToLatLng(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(4).toString()));
+                Log.d(TAG, "onPostExecute:FFFFFFFFFFFFFFFFF 2" +MainActivity.castStringToLatLng(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(6).toString()));
+               circleOptions1.center(MainActivity.castStringToLatLng(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(4).toString()));
+                circleOptions2.center(MainActivity.castStringToLatLng(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(6).toString()));
+
+
+
+              MainActivity.mMap.addCircle(circleOptions1);
+                MainActivity.mMap.addCircle(circleOptions2);
+                List<String> stationsForBottomSheet =castObjectToList(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(8));
                     MainActivity.meanName.setText(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(2).toString());
                     if (MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(2).toString().equals("Tramway")){
                         MainActivity.meanIcon.setImageResource(R.drawable.tram_front_view);
