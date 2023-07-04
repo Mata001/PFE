@@ -445,8 +445,36 @@ public class BestOnePath implements OnMapReadyCallback {
                 meanObject.add(jsonObject);
                 DirectionsParser directionsParser = new DirectionsParser();
                 routes = directionsParser.parse(jsonObject);
-//                Log.d(TAG, "doInBackground::: "+directionsParser.getdisdur(jsonObject));
-//                Log.d(TAG, "doInBackground: "+meanObject);
+                int Nb = Integer.valueOf(urlsNb);
+
+//            polylineNumbers.add(Nb);
+//            int totalNbPoly = Arrays.stream(polylineNumbers).sum();
+
+
+                if (meanObject.size() == Nb) {
+//                Log.d(TAG, "info list " + MainActivity.lakhra);
+                    int distanceReturned = acumilatorDurationDistance(meanObject);
+                    Log.d(TAG, "distanceReturned " + distanceReturned);
+                    distances.add(distanceReturned);
+                    meanObject.clear();
+                    Log.d(TAG, "distances " + distances);
+                    if (distanceReturned < MainActivity.shortestDistance) {
+                        MainActivity.shortestDistance = distanceReturned;
+                        MainActivity.shortestDistanceIndex = distances.indexOf(MainActivity.shortestDistance);
+                        Log.d(TAG, "shortest distance is " + MainActivity.shortestDistance);
+                        Log.d(TAG, "index ta shortest distance is " + distances.indexOf(MainActivity.shortestDistance));
+                        Log.d(TAG, "index ta shortest distance is " + MainActivity.shortestDistanceIndex);
+
+                    } else {
+                        Log.d(TAG, "shortest aw 9bl wla aw jay ");
+                    }
+                    Log.d(TAG, "index ta shortestII distance is " + MainActivity.shortestDistanceIndex);
+//                Log.d(TAG, "lisssssst polyyyys "+polylineOptionsArrayList);
+                } else {
+                    Log.d(TAG, "rah kayn decalage fel mean Object addition "+meanObject.size() +"   "+Nb);
+                }
+
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -457,38 +485,12 @@ public class BestOnePath implements OnMapReadyCallback {
 
         @Override
         public void onPostExecute(List<List<HashMap<String, String>>> lists) {
-            int Nb = Integer.valueOf(urlsNb);
             int totalNbPoly = 0;
             int startIndex = 0;
-//            polylineNumbers.add(Nb);
-//            int totalNbPoly = Arrays.stream(polylineNumbers).sum();
             for (int n = 0; n < polylineNumbers.size(); n++) {
                 totalNbPoly += polylineNumbers.get(n);
             }
             Log.d(TAG, "total Nb " + totalNbPoly);
-
-            if (meanObject.size() == Nb) {
-//                Log.d(TAG, "info list " + MainActivity.lakhra);
-                int distanceReturned = acumilatorDurationDistance(meanObject);
-                Log.d(TAG, "distanceReturned " + distanceReturned);
-                distances.add(distanceReturned);
-                meanObject.clear();
-                Log.d(TAG, "distances " + distances);
-                if (distanceReturned < MainActivity.shortestDistance) {
-                    MainActivity.shortestDistance = distanceReturned;
-                    MainActivity.shortestDistanceIndex = distances.indexOf(MainActivity.shortestDistance);
-                    Log.d(TAG, "shortest distance is " + MainActivity.shortestDistance);
-                    Log.d(TAG, "index ta shortest distance is " + distances.indexOf(MainActivity.shortestDistance));
-                    Log.d(TAG, "index ta shortest distance is " + MainActivity.shortestDistanceIndex);
-
-                } else {
-                    Log.d(TAG, "shortest aw 9bl wla aw jay ");
-                }
-                Log.d(TAG, "index ta shortest distance is  222" + MainActivity.shortestDistanceIndex);
-//                Log.d(TAG, "lisssssst polyyyys "+polylineOptionsArrayList);
-            } else {
-                Log.d(TAG, "rah kayn decalage fel mean Object addition ");
-            }
             ArrayList points = null;
             PolylineOptions polylineOptions = null;
             for (List<HashMap<String, String>> path : lists) {
@@ -549,10 +551,6 @@ public class BestOnePath implements OnMapReadyCallback {
                 circleOptions2.strokeWidth(10f);
 
                 circleOptions2.fillColor(Color.rgb(117, 196, 249));
-                Log.d(TAG, "onPostExecute:FFFFFFFFFFFFFFFFF 1" + MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(4).toString());
-
-                Log.d(TAG, "onPostExecute:FFFFFFFFFFFFFFFFF 2" + MainActivity.castStringToLatLng(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(4).toString()));
-                Log.d(TAG, "onPostExecute:FFFFFFFFFFFFFFFFF 2" + MainActivity.castStringToLatLng(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(6).toString()));
                 circleOptions1.center(MainActivity.castStringToLatLng(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(4).toString()));
                 circleOptions2.center(MainActivity.castStringToLatLng(MainActivity.lakhra.get(MainActivity.shortestDistanceIndex).get(6).toString()));
 
