@@ -105,21 +105,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         BestOnePath bestOnePath = new BestOnePath(this);
-
-
-//        bottomSheetContainer = findViewById(R.id.bottomsheetcontainer);
-//        bottomSheetBehavior =BottomSheetBehavior.from(bottomSheetContainer);
-//        View bottomSheet = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_layout, bottomSheetContainer, false);
-//        bottomSheetContainer.addView(layoutInclude);
-
-
         View layoutInclude = findViewById(R.id.layout_include);
         bottomSheetBehavior =BottomSheetBehavior.from(layoutInclude);
         bottomSheetBehavior.setHideable(true);
         bottomSheetBehavior.setPeekHeight(0);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         header_Arrow_Image = findViewById(R.id.bottom_sheet_arrow);
-
         header_Arrow_Image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,12 +133,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 header_Arrow_Image.setRotation(slideOffset * 180);
             }
         });
-//        bottomSheetContainer.addView(layoutInclude);
 
-
-//        bottomSheetBehavior.setPeekHeight(0);
-//        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-//        bottomSheetBehavior.setHideable(true);
 
         listPoints = new ArrayList<>();
         locdest = new ArrayList<>();
@@ -161,40 +147,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         waypoints1 = new ArrayList<>();
         waypoints2 = new ArrayList<>();
         wayppt = new ArrayList<>();
-
-         recyclerView = layoutInclude.findViewById(R.id.stationsList);
-//        ArrayList<StationItem> stationItems = new ArrayList<StationItem>();
-//        stationItems.add(new StationItem("Babazg&ag ", R.drawable.endpoint));
-//        stationItems.add(new StationItem("Babazg&ag ", R.drawable.closest_origin));
-//        stationItems.add(new StationItem("Baba wfezef &g", R.drawable.middle_station));
-//        stationItems.add(new StationItem("Baba weldi ", R.drawable.closest_destination));
-//        stationItems.add(new StationItem("Babazg&ag ", R.drawable.endpoint));
-//        Log.d(TAG, "stationsitemses " + stationItemses);
-//        ArrayList<StationItem> stationItems = new ArrayList<StationItem>();
-//        Log.d(TAG, "statttttt " + stationItems);
-//        myAdapter = new MyAdapter(this, stationItems);
-//        if (recyclerView != null) {
-//            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//            recyclerView.setAdapter(myAdapter);
-//        } else if (recyclerView == null) {
-//            Log.d(TAG, "kayn errorrr ");
-//
-//        }
-
+        recyclerView = layoutInclude.findViewById(R.id.stationsList);
         meanName = (TextView) findViewById(R.id.meanName);
         meanDuration = (TextView) findViewById(R.id.mean_duration);
         orginDuration = (TextView) findViewById(R.id.walk_duration_origin);
         destDuration = (TextView) findViewById(R.id.walk_duration_dest);
         meanIcon = (ImageView) findViewById(R.id.meanIcon);
-
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         FloatingActionButton currentLocationBtn = findViewById(R.id.currLoc);
         FloatingActionButton userGuideBtn = findViewById(R.id.userGuide);
         FloatingActionButton mapStyleBtn = findViewById(R.id.style);
         FloatingActionButton mapTypeBtn = findViewById(R.id.maptype);
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
@@ -211,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View view) {
                 bottomSheetBehavior.setPeekHeight(0);
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-//                bottomSheetBehavior.setState(Sta);
                 mMap.clear();
                 moveCameraToLocation(locdest1.get(0), 15);
             }
@@ -297,11 +260,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
-                Toast.makeText(MainActivity.this, place.getLatLng() + place.getName() + " is your destination", Toast.LENGTH_SHORT).show();
-//              marker
+
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(place.getLatLng()).title("destination").icon(BitmapDescriptorFactory.fromResource(R.drawable.piner));
                 mMap.addMarker(markerOptions).showInfoWindow();
+
                 BestOnePath.distances.clear();
                 shortestDistance = Integer.MAX_VALUE;
                 shortestDistanceIndex = -1;
@@ -331,11 +294,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //
 //                    }
 //                }, 10000);
-
-
 //                latlngToString(locdest1.get(0))
 //                ecole :35.665618,-0.634003
-                Log.d(TAG, "onPlaceSelected: latlanggggggggg "+latlngToString(place.getLatLng()));
             }
 
 
@@ -348,38 +308,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        ----------
 
     }
-
-//        BestOnePath.TaskParser taskParser = new TaskParser();
-//        BestOnePath.TaskParser taskParser= new BestOnePath.TaskParser();
-//        ArrayList<StationItem> stationItems = taskParser.parseTasks();
-
-
-//    public void showDialog(String placeName) {
-//        final Dialog dialog = new Dialog(this);
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        dialog.setContentView(R.layout.bottom_sheet_layout);
-//        destinationName = dialog.findViewById(R.id.destinationName);
-//        RecyclerView recyclerView = dialog.findViewById(R.id.stationsList);
-//
-//        destinationName.setText(placeName);
-////        Log.d(TAG, "statttttt 2" + stationItemses);
-////        myAdapter = new MyAdapter(this, stationItemses);
-////        if (recyclerView != null) {
-////            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-////            recyclerView.setAdapter(myAdapter);
-////        }else if(recyclerView==null){
-////            Log.d(TAG, "kayn errorrr ");
-////
-////        }else {
-////            Log.d(TAG, "onCreate: khraaaa ");
-////        }
-////        Log.d(TAG, "showDialog: ");
-//
-//        dialog.show();
-//        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-//        dialog.getWindow().setGravity(Gravity.BOTTOM);
-//    }
 
     //--------------------------------Enable Current Location--------------------------------
     private void enableCurrentLocation() {
@@ -417,7 +345,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-//        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MainActivity.class, R.raw.mapstyle));
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         //--------------------------------Location Permission--------------------------------
         // Check if location permission is granted
@@ -564,8 +491,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //--------------------------------ModelTram to Latlng--------------------------------
-    public static LatLng castToLatLng(ModelTram modelTram) {
-        String[] latlong = modelTram.getCoordinates().split(",");
+    public static LatLng castToLatLng(ModelNameCoordinates modelNameCoordinates) {
+        String[] latlong = modelNameCoordinates.getCoordinates().split(",");
         double longitude = Double.parseDouble(latlong[1]);
         double latitude = Double.parseDouble(latlong[0]);
         LatLng latLng = new LatLng(latitude, longitude);
@@ -593,10 +520,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mPressed = System.currentTimeMillis();
     }
 
-    public void someMethode(){
-//        BestOnePath.TaskParser taskParser1 = new BestOnePath.TaskParser(this);/
-
-    }
 
     @Override
     public void onCallbackStations(ArrayList<StationItem> list) {

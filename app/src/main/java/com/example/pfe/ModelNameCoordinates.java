@@ -1,14 +1,10 @@
 package com.example.pfe;
 
-import com.google.android.gms.maps.model.LatLng;
 
-import java.util.ArrayList;
-
-
-public class ModelTram {
+public class ModelNameCoordinates {
     String name,coordinates;
 
-    public ModelTram(String name, String coordinates) {
+    public ModelNameCoordinates(String name, String coordinates) {
         this.name = name;
         this.coordinates = coordinates;
     }
@@ -29,6 +25,6 @@ public class ModelTram {
         this.coordinates = coordinates;
     }
 
-    public ModelTram() {
+    public ModelNameCoordinates() {
     }
 }
