@@ -69,15 +69,12 @@ public class ClosestPointFinder {
         }
     }
 
+    //--------------------------------Create DistanceMtrx URL--------------------------------
     private static void makeDistanceRequest(String origin, List<String> destinations, DistanceCallback callback) {
         String apiUrl = "https://maps.googleapis.com/maps/api/distancematrix/json?mode=walking&";
         String destinationsString = TextUtils.join("|", destinations);
         String params = "key=" + API_KEY + "&origins=" + origin + "&destinations=" + destinationsString;
         String url = apiUrl + params;
-//        Log.d(TAG, "makeDistanceRequest: URL = " +url);
-
-//        Log.d(TAG, "origin 4 "+origin);
-//        origine=origin;
         new DistanceMatrixTask(callback, destinations).execute(url);
     }
 

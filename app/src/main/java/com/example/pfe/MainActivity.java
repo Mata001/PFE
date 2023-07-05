@@ -397,23 +397,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //--------------------------------Create Direction URL--------------------------------
     public static String getRequestUrl(LatLng origin, LatLng dest, List<String> wayppt, String mode) {
         String waypointsString = TextUtils.join("|via:", wayppt);
-        //Value of origin
         String str_org = "origin=" + origin.latitude + "," + origin.longitude;
-        //Value of destination
         String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
-        //Set value enable alternative ways
         String alt = "alternatives=TRUE";
-        //Set waypoints those are the bus stations
         String way = "waypoints=" + waypointsString;
-        //Mode for find direction
         String mod = "mode=" + mode;
-        //String key for api key
         String key = "key=AIzaSyCpqiUvaAud8Fa3o9L29kSJ5Yzu7V8pips";
         //            AIzaSyARlcOfXAA-JfGWFW6VH8AbtQbI96qjj6I hna ytbdl
         //            AIzaSyCnMasBoIdVpjj97TGyBUA44oC09BMxjUs hna ytbdl
-        //Build the full param
         String param = alt + "&" + str_org + "&" + mod + "&" + str_dest + "&" + way + "&" + key;
-        //Create url to request
         String url = "https://maps.googleapis.com/maps/api/directions/json?" + param;
         wayppt.clear();
         return url;
